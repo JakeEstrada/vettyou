@@ -47,12 +47,36 @@
     #overlay.hidden {
       display: none;
     }
+
+    #soundHint {
+      position: fixed;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #111;
+      font-family: system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+      display: none;
+    }
+
+    #soundHint.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <div id="overlay" role="button" tabindex="0" aria-label="Tap to play video">
     <img src="tallboys.png" alt="" decoding="async" />
   </div>
+  <button type="button" id="soundHint" aria-label="Tap to turn sound on">Tap for sound</button>
 
   <video id="vid" playsinline webkit-playsinline preload="auto">
     <source src="tallboyshoes.mp4" type="video/mp4">
@@ -62,6 +86,7 @@
   <script>
     const vid = document.getElementById("vid");
     const overlay = document.getElementById("overlay");
+    const soundHint = document.getElementById("soundHint");
     let started = false;
 
     function tryFullscreen() {
@@ -103,7 +128,27 @@
         started = false;
         overlay.classList.remove("hidden");
       });
+
+      vid.addEventListener(
+        "playing",
+        function maybeShowSoundHint() {
+          setTimeout(() => {
+            if (!vid.muted || vid.paused) return;
+            soundHint.classList.add("show");
+          }, 300);
+        },
+        { once: true }
+      );
     }
+
+    function unmuteFromHint(e) {
+      e.preventDefault();
+      vid.muted = false;
+      soundHint.classList.remove("show");
+    }
+
+    soundHint.addEventListener("click", unmuteFromHint);
+    soundHint.addEventListener("touchend", unmuteFromHint, { passive: false });
 
     overlay.addEventListener("click", startVideo);
     overlay.addEventListener(
