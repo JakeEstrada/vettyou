@@ -78,7 +78,7 @@
   </div>
   <button type="button" id="soundHint" aria-label="Tap to turn sound on">Tap for sound</button>
 
-  <video id="vid" playsinline webkit-playsinline preload="auto">
+  <video id="vid" playsinline webkit-playsinline preload="auto" fetchpriority="high">
     <source src="tallboyshoes.mp4" type="video/mp4">
     Your browser does not support HTML5 video.
   </video>
@@ -88,6 +88,16 @@
     const overlay = document.getElementById("overlay");
     const soundHint = document.getElementById("soundHint");
     let started = false;
+    let prewarmDone = false;
+
+    /** Start muted decode/buffer on press — iOS often waits for a gesture; this uses finger-down time before release. */
+    function prewarmPlay() {
+      if (started || prewarmDone) return;
+      prewarmDone = true;
+      vid.muted = true;
+      const p = vid.play();
+      if (p !== undefined) p.catch(() => {});
+    }
 
     function tryFullscreen() {
       const el = document.documentElement;
@@ -135,7 +145,7 @@
           setTimeout(() => {
             if (!vid.muted || vid.paused) return;
             soundHint.classList.add("show");
-          }, 300);
+          }, 120);
         },
         { once: true }
       );
@@ -150,6 +160,8 @@
     soundHint.addEventListener("click", unmuteFromHint);
     soundHint.addEventListener("touchend", unmuteFromHint, { passive: false });
 
+    overlay.addEventListener("pointerdown", prewarmPlay, { passive: true });
+    overlay.addEventListener("touchstart", prewarmPlay, { passive: true });
     overlay.addEventListener("click", startVideo);
     overlay.addEventListener(
       "touchend",
