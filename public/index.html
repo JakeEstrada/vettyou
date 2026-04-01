@@ -54,7 +54,7 @@
     <img src="tallboys.png" alt="" decoding="async" />
   </div>
 
-  <video id="vid" playsinline preload="auto">
+  <video id="vid" playsinline webkit-playsinline preload="auto">
     <source src="tallboyshoes.mp4" type="video/mp4">
     Your browser does not support HTML5 video.
   </video>
@@ -62,28 +62,63 @@
   <script>
     const vid = document.getElementById("vid");
     const overlay = document.getElementById("overlay");
+    let started = false;
 
-    async function startVideo() {
-      try {
-        vid.muted = false;
-        vid.volume = 1.0;
-
-        overlay.classList.add("hidden");
-
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        }
-
-        await vid.play();
-      } catch (err) {
-        console.log("Playback blocked:", err);
-        overlay.classList.remove("hidden");
-      }
+    function tryFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
     }
 
-    document.addEventListener("click", startVideo, { once: true });
-    document.addEventListener("keydown", startVideo, { once: true });
-    document.addEventListener("touchstart", startVideo, { once: true });
+    /**
+     * iOS Safari requires play() to run in the same turn as the user tap.
+     * async/await before play() breaks that and muted video is blocked less often,
+     * so we try unmuted first, then muted play + unmute in the same promise chain.
+     */
+    function startVideo(evt) {
+      if (started) return;
+      started = true;
+      evt?.preventDefault?.();
+
+      overlay.classList.add("hidden");
+      vid.volume = 1;
+
+      const run = () => {
+        tryFullscreen();
+      };
+
+      vid.muted = false;
+      const p = vid.play();
+      if (p === undefined) {
+        run();
+        return;
+      }
+
+      p.then(run).catch(() => {
+        vid.muted = true;
+        return vid.play().then(() => {
+          vid.muted = false;
+          run();
+        });
+      }).catch(() => {
+        started = false;
+        overlay.classList.remove("hidden");
+      });
+    }
+
+    overlay.addEventListener("click", startVideo);
+    overlay.addEventListener(
+      "touchend",
+      (e) => {
+        startVideo(e);
+      },
+      { passive: false }
+    );
+    overlay.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        startVideo(e);
+      }
+    });
   </script>
 </body>
 </html>
