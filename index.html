@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viewer</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+    }
+
+    #vid {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      background: black;
+      display: block;
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: black;
+      z-index: 10;
+      user-select: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #overlay img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    #overlay.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay" role="button" tabindex="0" aria-label="Tap to play video">
+    <img src="tallboys.png" alt="" decoding="async" />
+  </div>
+
+  <video id="vid" playsinline preload="auto">
+    <source src="tallboyshoes.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
+  <script>
+    const vid = document.getElementById("vid");
+    const overlay = document.getElementById("overlay");
+
+    async function startVideo() {
+      try {
+        vid.muted = false;
+        vid.volume = 1.0;
+
+        overlay.classList.add("hidden");
+
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+
+        await vid.play();
+      } catch (err) {
+        console.log("Playback blocked:", err);
+        overlay.classList.remove("hidden");
+      }
+    }
+
+    document.addEventListener("click", startVideo, { once: true });
+    document.addEventListener("keydown", startVideo, { once: true });
+    document.addEventListener("touchstart", startVideo, { once: true });
+  </script>
+</body>
+</html>
