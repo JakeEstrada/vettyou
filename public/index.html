@@ -3,34 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Fake Ice Cream — All your fake faves, all in one prank</title>
-  <meta name="description" content="The best ice cream brands. (NOT.) All your fake faves, all in one prank." />
+  <title>Ice Cream — All your faves, all in one place</title>
+  <meta name="description" content="The best ice cream brands. All your faves, all in one place." />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Fake Ice Cream — All your fake faves, all in one prank" />
-  <meta property="og:description" content="The best ice cream brands. (NOT.) So cold! So creamy! So pranked!" />
-  <!-- If previews require absolute URLs, use https://your-domain/hero-prank.png -->
-  <meta property="og:image" content="hero-prank.png" />
+  <meta property="og:title" content="Ice Cream — All your faves, all in one place" />
+  <meta property="og:description" content="So cold! So creamy! So yum!" />
+  <!-- If previews require absolute URLs, use https://your-domain/hero-icecream.png -->
+  <meta property="og:image" content="hero-icecream.png" />
   <meta property="og:image:width" content="1024" />
   <meta property="og:image:height" content="671" />
-  <meta property="og:image:alt" content="Prank ice cream hero" />
+  <meta property="og:image:alt" content="Ice cream hero — woman with cone and popsicle" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Fake Ice Cream — All your fake faves, all in one prank" />
-  <meta name="twitter:description" content="The best ice cream brands. (NOT.) So pranked!" />
-  <meta name="twitter:image" content="hero-prank.png" />
+  <meta name="twitter:title" content="Ice Cream — All your faves, all in one place" />
+  <meta name="twitter:description" content="The best ice cream brands. So cold! So creamy! So yum!" />
+  <meta name="twitter:image" content="hero-icecream.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@500;600;700&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --blue: #d6efff;
-      --tan: #e5d1b8;
+      --blue: #d1efff;
+      --tan: #c9b49a;
       --navy: #0a2341;
-      --cream: #fff9f0;
+      --cream: #faf6ef;
       --pink: #ff6ba8;
       --pink-deep: #e8488a;
-      --yellow-pop: #ffe566;
-      --red-outline: #c41e3a;
-      --nav-ice: linear-gradient(180deg, #fffef9 0%, #f3ead4 55%, #ebe0cc 100%);
+      --yellow-cta: #fff3a0;
       --nav-shadow: 0 10px 28px rgba(10, 35, 65, 0.12);
     }
 
@@ -193,21 +191,9 @@
       transform: translateY(-42%);
       z-index: 20;
       padding: 0 clamp(12px, 3vw, 40px);
-      padding-left: max(52px, clamp(12px, 3vw, 40px), env(safe-area-inset-left));
+      padding-left: max(clamp(12px, 3vw, 40px), env(safe-area-inset-left));
       padding-right: max(clamp(12px, 3vw, 40px), env(safe-area-inset-right));
       pointer-events: none;
-    }
-
-    .nav-cherry {
-      position: absolute;
-      left: max(4px, env(safe-area-inset-left));
-      top: 50%;
-      transform: translate(-8%, -58%);
-      width: min(56px, 14vw);
-      height: min(56px, 14vw);
-      z-index: 25;
-      pointer-events: none;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
     }
 
     .nav-shell .main-nav,
@@ -225,30 +211,52 @@
       gap: 8px;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 16px clamp(14px, 2.5vw, 28px) 22px;
-      background: var(--nav-ice);
-      border-radius: 999px 999px 32px 32px;
+      padding: 18px clamp(14px, 2.5vw, 28px) 24px;
+      background-color: #f7f0e4;
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.08'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, #fffdf8 0%, #f4ead8 45%, #ebe0d0 100%);
+      border-radius: 999px 999px 36px 36px;
       box-shadow: var(--nav-shadow);
       min-height: 64px;
-      border: 1px solid rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .main-nav::before {
+      content: "";
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      top: 2px;
+      height: 16px;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 8px 12px at 10% 100%, #ffb8d9, transparent 65%),
+        radial-gradient(ellipse 10px 14px at 25% 100%, #ff9ec9, transparent 70%),
+        radial-gradient(ellipse 9px 13px at 42% 100%, #ffb8d9, transparent 65%),
+        radial-gradient(ellipse 11px 15px at 58% 100%, #ff8ec0, transparent 70%),
+        radial-gradient(ellipse 8px 12px at 74% 100%, #ffb8d9, transparent 65%),
+        radial-gradient(ellipse 10px 14px at 90% 100%, #ff9ec9, transparent 70%);
+      opacity: 0.85;
     }
 
     .main-nav::after {
       content: "";
       position: absolute;
-      left: 8%;
-      right: 8%;
-      bottom: 4px;
-      height: 14px;
+      left: 6%;
+      right: 6%;
+      bottom: 3px;
+      height: 16px;
       pointer-events: none;
       z-index: 0;
       background:
-        radial-gradient(ellipse 10px 14px at 12% 0, #ebe0cc, transparent 70%),
-        radial-gradient(ellipse 8px 12px at 28% 2px, #ebe0cc, transparent 70%),
-        radial-gradient(ellipse 12px 16px at 48% 0, #ebe0cc, transparent 70%),
-        radial-gradient(ellipse 9px 13px at 68% 3px, #ebe0cc, transparent 70%),
-        radial-gradient(ellipse 11px 15px at 86% 0, #ebe0cc, transparent 70%);
-      opacity: 0.95;
+        radial-gradient(ellipse 10px 15px at 14% 0, #ff9ec9, transparent 70%),
+        radial-gradient(ellipse 9px 13px at 32% 0, #ffb8d9, transparent 68%),
+        radial-gradient(ellipse 12px 17px at 50% 0, #ff8ec0, transparent 72%),
+        radial-gradient(ellipse 9px 14px at 68% 0, #ffb8d9, transparent 68%),
+        radial-gradient(ellipse 11px 16px at 86% 0, #ff9ec9, transparent 70%);
+      opacity: 0.9;
     }
 
     .main-nav__menu {
@@ -337,9 +345,9 @@
         #b8d9f5 6px,
         #b8d9f5 12px
       );
-      border: 3px solid #fff;
+      border: 3px solid #2a6fad;
       box-shadow:
-        0 0 0 2px rgba(10, 35, 65, 0.15),
+        0 0 0 2px #fff,
         0 10px 24px rgba(10, 35, 65, 0.15);
     }
 
@@ -347,7 +355,7 @@
       width: 34px;
       height: 34px;
       margin-top: 2px;
-      color: #111;
+      color: #1a5a9e;
     }
 
     .main-nav__logo-text {
@@ -364,23 +372,24 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
+      width: 40px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(10, 35, 65, 0.12);
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: inset 0 2px 4px rgba(10, 35, 65, 0.06);
       color: var(--navy);
       cursor: pointer;
     }
 
     @media (hover: hover) and (pointer: fine) {
       .main-nav__search:hover {
-        background: rgba(0, 31, 63, 0.06);
+        background: rgba(255, 255, 255, 0.85);
       }
     }
 
     .main-nav__search:active {
-      background: rgba(0, 31, 63, 0.1);
+      background: rgba(255, 255, 255, 0.65);
     }
 
     .hero {
@@ -397,7 +406,7 @@
         radial-gradient(ellipse 120% 80% at 20% 0%, rgba(255, 255, 255, 0.55), transparent 45%),
         radial-gradient(circle at 80% 100%, rgba(255, 255, 255, 0.25), transparent 40%),
         url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-      padding: clamp(32px, 6vw, 80px) clamp(24px, 5vw, 72px) clamp(100px, 14vh, 140px);
+      padding: clamp(32px, 6vw, 80px) clamp(24px, 5vw, 72px) clamp(40px, 8vh, 72px);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -425,41 +434,27 @@
       color: var(--navy);
     }
 
-    .hero__muhaha {
-      font-family: "Pacifico", cursive;
-      font-size: clamp(1.75rem, 5vw, 2.75rem);
-      line-height: 1;
-      margin: 4px 0 8px;
-      color: var(--yellow-pop);
-      text-shadow:
-        2px 2px 0 var(--red-outline),
-        -1px -1px 0 var(--red-outline),
-        1px -1px 0 var(--red-outline),
-        -1px 1px 0 var(--red-outline);
-      transform: rotate(-4deg);
-    }
-
     .hero__cta {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       margin-top: 10px;
-      padding: 16px 26px 20px;
+      padding: 16px 28px 22px;
       border: none;
-      border-radius: 14px 14px 18px 18px;
-      background: linear-gradient(180deg, #ff8ec0 0%, var(--pink) 35%, var(--pink-deep) 100%);
-      color: #fff;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ff8ec0 0%, var(--pink) 40%, var(--pink-deep) 100%);
+      color: var(--yellow-cta);
       font-family: "Montserrat", system-ui, sans-serif;
       font-size: clamp(14px, 1.5vw, 16px);
       font-weight: 800;
       letter-spacing: 0.02em;
       cursor: pointer;
-      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+      text-shadow: 0 1px 0 rgba(120, 20, 60, 0.35);
       box-shadow:
         0 6px 0 #9c1f52,
-        0 10px 24px rgba(200, 40, 100, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        0 12px 26px rgba(200, 40, 100, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
       touch-action: manipulation;
       width: fit-content;
       max-width: 100%;
@@ -470,37 +465,37 @@
     .hero__cta::after {
       content: "";
       position: absolute;
-      bottom: -6px;
-      width: 10px;
-      height: 14px;
+      bottom: -5px;
+      width: 9px;
+      height: 12px;
       background: var(--pink-deep);
       border-radius: 0 0 50% 50%;
       box-shadow: 0 3px 0 #9c1f52;
     }
 
     .hero__cta::before {
-      left: 18%;
+      left: 20%;
     }
 
     .hero__cta::after {
-      right: 22%;
-      width: 8px;
-      height: 12px;
+      right: 24%;
+      width: 7px;
+      height: 10px;
     }
 
     @media (hover: hover) and (pointer: fine) {
       .hero__cta:hover {
-        filter: brightness(1.05);
+        filter: brightness(1.04);
       }
     }
 
     .hero__cta:active {
-      filter: brightness(0.96);
+      filter: brightness(0.97);
       transform: translateY(2px) scale(0.99);
       box-shadow:
         0 3px 0 #9c1f52,
-        0 6px 16px rgba(200, 40, 100, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        0 8px 18px rgba(200, 40, 100, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
 
     .hero__cta span {
@@ -508,19 +503,10 @@
       line-height: 1;
     }
 
-    .hero__dead-cone {
-      position: absolute;
-      left: max(8px, env(safe-area-inset-left));
-      bottom: max(8px, env(safe-area-inset-bottom));
-      width: min(100px, 28vw);
-      height: auto;
-      pointer-events: none;
-      filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.08));
-    }
-
     .hero__right {
       position: relative;
-      background: var(--tan);
+      background-color: var(--tan);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23k)' opacity='0.05'/%3E%3C/svg%3E");
       overflow: hidden;
       border-bottom-left-radius: clamp(48px, 12vw, 120px);
       min-height: 280px;
@@ -540,10 +526,12 @@
       pointer-events: none;
       z-index: 1;
       background:
-        radial-gradient(circle at 12% 78%, rgba(255, 140, 180, 0.45) 0, transparent 35%),
-        radial-gradient(circle at 88% 22%, rgba(255, 120, 170, 0.35) 0, transparent 28%),
-        radial-gradient(circle at 70% 85%, rgba(255, 160, 200, 0.4) 0, transparent 22%),
-        radial-gradient(circle at 40% 12%, rgba(255, 130, 175, 0.25) 0, transparent 20%);
+        radial-gradient(circle at 12% 78%, rgba(255, 140, 180, 0.38) 0, transparent 34%),
+        radial-gradient(circle at 88% 22%, rgba(255, 120, 170, 0.3) 0, transparent 26%),
+        radial-gradient(circle at 70% 85%, rgba(255, 160, 200, 0.34) 0, transparent 22%),
+        radial-gradient(circle at 40% 12%, rgba(255, 130, 175, 0.22) 0, transparent 18%),
+        radial-gradient(circle at 22% 30%, rgba(120, 170, 230, 0.22) 0, transparent 16%),
+        radial-gradient(circle at 82% 55%, rgba(100, 150, 220, 0.18) 0, transparent 14%);
     }
 
     .hero__arc-wrap {
@@ -569,10 +557,13 @@
       font-family: "Bangers", cursive;
       font-size: clamp(1.5rem, 4.5vw, 2.25rem);
       line-height: 1;
-      color: var(--yellow-pop);
+      color: #ffe566;
       text-shadow:
-        2px 2px 0 var(--red-outline),
-        -1px 2px 0 var(--red-outline);
+        2px 2px 0 #1e5a9e,
+        -1px 2px 0 #1e5a9e,
+        2px -1px 0 #1e5a9e,
+        -1px -1px 0 #1e5a9e,
+        0 3px 0 rgba(0, 40, 90, 0.25);
       z-index: 2;
       pointer-events: none;
       letter-spacing: 0.04em;
@@ -716,7 +707,8 @@
 
       .main-nav__search {
         width: 48px;
-        height: 48px;
+        height: 40px;
+        min-height: 44px;
       }
 
       .nav-shell {
@@ -740,12 +732,6 @@
 
       .hero__img {
         object-position: center 12%;
-      }
-
-      .nav-cherry {
-        width: min(48px, 12vw);
-        height: min(48px, 12vw);
-        transform: translate(-4%, -52%);
       }
 
       .hero__left {
@@ -834,38 +820,26 @@
 
   <div class="landing">
   <div class="utility">
-    <div class="utility__brands" aria-label="Totally real brands (satire)">
-      <span class="brand-pill">Fäagen-Daaz</span>
-      <span class="brand-pill">Outshrine</span>
-      <span class="brand-pill">Drumbstick</span>
-      <span class="brand-pill">Oreh-no</span>
-      <span class="brand-pill">Skinny Moo</span>
-      <span class="brand-pill">Dryer’s</span>
+    <div class="utility__brands" aria-label="Highlights">
+      <span class="brand-pill">Small batch</span>
+      <span class="brand-pill">Real dairy</span>
+      <span class="brand-pill">Handcrafted</span>
+      <span class="brand-pill">Summer flavors</span>
+      <span class="brand-pill">Cone club</span>
+      <span class="brand-pill">Sundaes</span>
     </div>
     <div class="utility__links">
-      <a href="#">Fake Corporate</a>
-      <a href="#">Fake Foodservice</a>
+      <a href="#">Corporate</a>
+      <a href="#">Foodservice</a>
     </div>
   </div>
 
   <div class="hero-area">
     <div class="nav-shell">
-      <div class="nav-cherry" aria-hidden="true">
-        <svg viewBox="0 0 64 72" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M32 4c-4 0-8 3-8 8 0 3 1.5 5.5 4 7l-2 18h12L36 19c2.5-1.5 4-4 4-7 0-5-4-8-8-8z" fill="#2d8a4e"/>
-          <ellipse cx="32" cy="38" rx="22" ry="20" fill="#ff4d7d"/>
-          <ellipse cx="32" cy="42" rx="18" ry="8" fill="#ff7eb3" opacity=".5"/>
-          <path d="M18 52 Q32 68 46 52" stroke="#d4145a" stroke-width="3" stroke-linecap="round" fill="none"/>
-          <circle cx="24" cy="34" r="3" fill="#1a1a1a"/>
-          <circle cx="40" cy="34" r="3" fill="#1a1a1a"/>
-          <path d="M26 40h12" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-          <path d="M28 8 L32 2 L36 8" stroke="#5a3a22" stroke-width="2" fill="none"/>
-        </svg>
-      </div>
       <nav class="main-nav" aria-label="Primary">
         <div class="main-nav__group main-nav__group--left">
-          <a href="#">Fake Products</a>
-          <a href="#">Fake Recipes</a>
+          <a href="#">Products</a>
+          <a href="#">Recipes</a>
         </div>
         <button
           type="button"
@@ -883,15 +857,15 @@
           <a href="#" class="main-nav__logo" aria-label="Ice Cream home">
             <span class="main-nav__logo-text">Ice Cream</span>
             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M24 10c-5 0-9 3.5-9 8 0 1.5.4 2.8 1.2 4L12 40h24L31.8 22c.8-1.2 1.2-2.6 1.2-4 0-4.5-4-8-9-8z" fill="#111"/>
-              <path d="M18 24h12" stroke="#fff" stroke-opacity=".25" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M24 10c-5 0-9 3.5-9 8 0 1.5.4 2.8 1.2 4L12 40h24L31.8 22c.8-1.2 1.2-2.6 1.2-4 0-4.5-4-8-9-8z" fill="#1a5a9e"/>
+              <path d="M18 24h12" stroke="#fff" stroke-opacity=".35" stroke-width="1.3" stroke-linecap="round"/>
             </svg>
           </a>
         </div>
         <div class="main-nav__group main-nav__group--right">
           <div class="main-nav__right-links">
-            <a href="#">Fake Recipes</a>
-            <a href="#">Experienc Ice Cream?</a>
+            <a href="#">Brands</a>
+            <a href="#">Experience Ice Cream?</a>
           </div>
           <button type="button" class="main-nav__search" aria-label="Search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -903,33 +877,19 @@
       </nav>
       <div id="mobile-nav-panel" class="mobile-nav-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-nav-title" hidden>
         <p id="mobile-nav-title" class="visually-hidden">Site menu</p>
-        <a href="#">Fake Products</a>
-        <a href="#">Fake Recipes</a>
-        <a href="#">Fake Recipes (yes, again)</a>
-        <a href="#">Experienc Ice Cream?</a>
+        <a href="#">Products</a>
+        <a href="#">Recipes</a>
+        <a href="#">Brands</a>
+        <a href="#">Experience Ice Cream?</a>
       </div>
       <div class="mobile-nav-backdrop" id="mobile-nav-backdrop" hidden aria-hidden="true"></div>
     </div>
     <main class="hero">
       <section class="hero__left" aria-labelledby="hero-heading">
-        <p class="hero__kicker">The best ice cream brands. (NOT.)</p>
-        <h1 id="hero-heading" class="hero__title">All your fake faves, all in one prank!</h1>
-        <p class="hero__muhaha">Muhahaha!</p>
-        <button type="button" class="hero__cta js-play">Get the scoop, sucker! <span aria-hidden="true">→</span></button>
-        <p class="hero__play-hint">Tap the photo or pink button to play the video.</p>
-        <div class="hero__dead-cone" aria-hidden="true">
-          <svg viewBox="0 0 120 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <path d="M60 8 L95 115 H25 Z" fill="#e8c49a" stroke="#c4a574" stroke-width="2"/>
-            <ellipse cx="60" cy="38" rx="38" ry="36" fill="#ff8ec8"/>
-            <ellipse cx="60" cy="42" rx="32" ry="14" fill="#ffb8dc" opacity=".6"/>
-            <path d="M42 32l8 8m20-8l-8 8" stroke="#222" stroke-width="3" stroke-linecap="round"/>
-            <path d="M48 52 Q60 62 72 52" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M58 58 L64 78 L70 58 Z" fill="#ff6b9d"/>
-            <circle cx="28" cy="24" r="6" fill="#ff8ec8" opacity=".7"/>
-            <circle cx="92" cy="30" r="4" fill="#ff8ec8" opacity=".5"/>
-            <circle cx="18" cy="70" r="5" fill="#ff8ec8" opacity=".45"/>
-          </svg>
-        </div>
+        <p class="hero__kicker">The best ice cream brands.</p>
+        <h1 id="hero-heading" class="hero__title">All your faves, all in one place!</h1>
+        <button type="button" class="hero__cta js-play">Get the scoop! <span aria-hidden="true">→</span></button>
+        <p class="hero__play-hint">Tap the photo or button to play the video.</p>
       </section>
       <div
         class="hero__right js-play"
@@ -937,15 +897,15 @@
         tabindex="0"
         aria-label="Play video"
       >
-        <img class="hero__img" src="hero-prank.png" alt="" width="1024" height="671" decoding="async" />
+        <img class="hero__img" src="hero-icecream.png" alt="" width="1024" height="671" decoding="async" />
         <div class="hero__splats" aria-hidden="true"></div>
         <div class="hero__arc-wrap" aria-hidden="true">
           <svg viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <defs>
               <path id="heroArcPath" d="M 36 82 Q 240 4 444 82" fill="none"/>
             </defs>
-            <text font-family="Pacifico, cursive" font-size="26" fill="#ffe566" stroke="#c41e3a" stroke-width="1.4" paint-order="stroke fill">
-              <textPath xlink:href="#heroArcPath" href="#heroArcPath" startOffset="50%" text-anchor="middle">So cold! So creamy! So pranked!</textPath>
+            <text font-family="Pacifico, cursive" font-size="26" fill="#fff8e7" stroke="#5c4033" stroke-width="1.6" paint-order="stroke fill">
+              <textPath xlink:href="#heroArcPath" href="#heroArcPath" startOffset="50%" text-anchor="middle">So cold! So creamy! So yum!</textPath>
             </text>
           </svg>
         </div>
