@@ -28,6 +28,60 @@
       background: var(--cream);
     }
 
+    body.video-playing {
+      overflow: hidden;
+    }
+
+    #vid {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 1;
+      display: block;
+      background: #000;
+      pointer-events: none;
+    }
+
+    body.video-playing #vid {
+      z-index: 100;
+      pointer-events: auto;
+    }
+
+    .landing {
+      position: relative;
+      z-index: 2;
+    }
+
+    body.video-playing .landing {
+      display: none;
+    }
+
+    #soundHint {
+      position: fixed;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 120;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #111;
+      font-family: "Montserrat", system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+      border: none;
+      display: none;
+    }
+
+    #soundHint.show {
+      display: block;
+    }
+
     body {
       font-family: "Montserrat", system-ui, sans-serif;
       font-size: 15px;
@@ -260,6 +314,13 @@
       overflow: hidden;
       border-bottom-left-radius: clamp(48px, 12vw, 120px);
       min-height: 280px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hero__right:focus {
+      outline: 2px solid var(--navy);
+      outline-offset: 4px;
     }
 
     .hero__pattern {
@@ -367,6 +428,12 @@
   </style>
 </head>
 <body>
+  <video id="vid" playsinline webkit-playsinline preload="auto" fetchpriority="high">
+    <source src="output.mp4" type="video/mp4" />
+    Your browser does not support HTML5 video.
+  </video>
+
+  <div class="landing">
   <div class="utility">
     <div class="utility__brands" aria-label="Featured brands">
       <span class="brand-pill">Häagen-Dazs</span>
@@ -417,16 +484,115 @@
       <section class="hero__left" aria-labelledby="hero-heading">
         <p class="hero__kicker">The best ice cream brands</p>
         <h1 id="hero-heading" class="hero__title">All your faves, all in one place.</h1>
-        <button type="button" class="hero__cta">Get the scoop! <span aria-hidden="true">→</span></button>
+        <button type="button" class="hero__cta js-play">Get the scoop! <span aria-hidden="true">→</span></button>
       </section>
-      <div class="hero__right" aria-hidden="true">
+      <div
+        class="hero__right js-play"
+        role="button"
+        tabindex="0"
+        aria-label="Play video"
+      >
         <div class="hero__pattern"></div>
         <div class="hero__pattern-text">Craviest. Yummiest. Craviest. Yummiest.</div>
-        <img class="hero__img" src="hero-reference.png" alt="" width="1024" height="531" decoding="async" />
+        <img class="hero__img" src="tallboys.png" alt="" decoding="async" />
       </div>
     </main>
   </div>
 
   <button type="button" class="a11y-fab" aria-label="Accessibility options">co</button>
+  </div>
+
+  <button type="button" id="soundHint" aria-label="Tap to turn sound on">Tap for sound</button>
+
+  <script>
+    const vid = document.getElementById("vid");
+    const soundHint = document.getElementById("soundHint");
+    const playTargets = document.querySelectorAll(".js-play");
+    let started = false;
+    let prewarmDone = false;
+
+    function prewarmPlay() {
+      if (started || prewarmDone) return;
+      prewarmDone = true;
+      vid.muted = true;
+      const p = vid.play();
+      if (p !== undefined) p.catch(() => {});
+    }
+
+    function tryFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+    }
+
+    function startVideo(evt) {
+      if (started) return;
+      started = true;
+      evt?.preventDefault?.();
+
+      document.body.classList.add("video-playing");
+      vid.volume = 1;
+
+      const run = () => {
+        tryFullscreen();
+      };
+
+      vid.muted = false;
+      const p = vid.play();
+      if (p === undefined) {
+        run();
+        return;
+      }
+
+      p.then(run).catch(() => {
+        vid.muted = true;
+        return vid.play().then(() => {
+          vid.muted = false;
+          run();
+        });
+      }).catch(() => {
+        started = false;
+        document.body.classList.remove("video-playing");
+      });
+
+      vid.addEventListener(
+        "playing",
+        function maybeShowSoundHint() {
+          setTimeout(() => {
+            if (!vid.muted || vid.paused) return;
+            soundHint.classList.add("show");
+          }, 120);
+        },
+        { once: true }
+      );
+    }
+
+    function unmuteFromHint(e) {
+      e.preventDefault();
+      vid.muted = false;
+      soundHint.classList.remove("show");
+    }
+
+    soundHint.addEventListener("click", unmuteFromHint);
+    soundHint.addEventListener("touchend", unmuteFromHint, { passive: false });
+
+    playTargets.forEach((el) => {
+      el.addEventListener("pointerdown", prewarmPlay, { passive: true });
+      el.addEventListener("touchstart", prewarmPlay, { passive: true });
+      el.addEventListener("click", startVideo);
+      el.addEventListener(
+        "touchend",
+        (e) => {
+          startVideo(e);
+        },
+        { passive: false }
+      );
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          startVideo(e);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
