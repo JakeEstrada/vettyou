@@ -724,14 +724,17 @@
 
       .hero__right {
         order: -1;
-        min-height: min(46dvh, 420px);
-        min-height: min(46vh, 420px);
+        width: 100%;
+        /* Match hero photo aspect (1024×671) so object-fit:cover shows the full frame on narrow screens */
+        aspect-ratio: 1024 / 671;
+        min-height: 0;
         border-bottom-left-radius: 56px;
         border-bottom-right-radius: 56px;
       }
 
       .hero__img {
-        object-position: center 12%;
+        object-fit: cover;
+        object-position: center center;
       }
 
       .hero__left {
