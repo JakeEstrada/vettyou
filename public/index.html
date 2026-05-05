@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Until Saturday</title>
+  <title>Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -11,32 +14,164 @@
       padding: 0;
     }
     html, body {
-      height: 100%;
-      background: #000;
-      color: #fff;
-      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100%;
+      font-family: Montserrat, Helvetica Neue, Helvetica, Arial, sans-serif;
       font-weight: 700;
+      color: #fff;
+      background: radial-gradient(ellipse 85% 65% at 50% 42%, #252525 0%, #121212 45%, #0a0a0a 100%);
+      background-color: #0a0a0a;
+      background-attachment: fixed;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1rem, 4vw, 2.5rem);
+      gap: clamp(1.75rem, 5vw, 3rem);
+    }
+    .title {
+      font-size: clamp(0.95rem, 3.5vw, 1.35rem);
+      font-weight: 800;
+      letter-spacing: 0.38em;
+      text-indent: 0.38em;
+      text-align: center;
+      color: #fff;
+    }
+    .timer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: clamp(0.65rem, 3vw, 1.35rem);
+      width: 100%;
+      max-width: 52rem;
+    }
+    .unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      flex: 1 1 5rem;
+      min-width: 0;
+      max-width: 11rem;
+    }
+    .flip-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1.05;
+      max-height: 10.5rem;
+      border-radius: 10px;
+      background: linear-gradient(
+        180deg,
+        #3d3d3d 0%,
+        #2e2e2e 18%,
+        #282828 50%,
+        #222 50.5%,
+        #1c1c1c 100%
+      );
+      box-shadow:
+        0 10px 28px rgba(0, 0, 0, 0.55),
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+    }
+    .flip-card::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 3px;
+      margin-top: -1px;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.65) 0%,
+        #0d0d0d 40%,
+        #151515 60%,
+        rgba(0, 0, 0, 0.5) 100%
+      );
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.04),
+        inset 0 1px 2px rgba(0, 0, 0, 0.9);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .flip-num {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    #countdown {
-      font-size: clamp(1.5rem, 8vw, 4rem);
+      font-size: clamp(1.85rem, 10vw, 3.35rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
       letter-spacing: 0.02em;
+      line-height: 1;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+      z-index: 1;
+    }
+    .label {
+      font-size: clamp(0.62rem, 2vw, 0.72rem);
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-indent: 0.28em;
+      color: #d4a017;
       text-align: center;
-      padding: 1rem;
-      line-height: 1.35;
-      white-space: nowrap;
+    }
+    .footer {
+      font-size: clamp(0.58rem, 1.8vw, 0.68rem);
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      color: #d4a017;
+      opacity: 0.95;
     }
     @media (max-width: 520px) {
-      #countdown {
-        white-space: normal;
+      .timer {
+        gap: 0.75rem 0.5rem;
+      }
+      .unit {
+        flex: 1 1 42%;
+        max-width: none;
       }
     }
   </style>
 </head>
 <body>
-  <div id="countdown" aria-live="polite"></div>
+  <main class="page">
+    <h1 class="title">COMING SOON ....</h1>
+
+    <div class="timer" role="timer" aria-live="polite" aria-atomic="true">
+      <div class="unit">
+        <div class="flip-card">
+          <span class="flip-num" id="val-days">0</span>
+        </div>
+        <p class="label">DAYS</p>
+      </div>
+      <div class="unit">
+        <div class="flip-card">
+          <span class="flip-num" id="val-hours">00</span>
+        </div>
+        <p class="label">HOURS</p>
+      </div>
+      <div class="unit">
+        <div class="flip-card">
+          <span class="flip-num" id="val-minutes">00</span>
+        </div>
+        <p class="label">MINUTES</p>
+      </div>
+      <div class="unit">
+        <div class="flip-card">
+          <span class="flip-num" id="val-seconds">00</span>
+        </div>
+        <p class="label">SECONDS</p>
+      </div>
+    </div>
+
+    <p class="footer">UNTIL SATURDAY</p>
+  </main>
   <script>
     function nextSaturdayStart() {
       const now = new Date();
@@ -51,7 +186,7 @@
       return t;
     }
 
-    function pad(n) {
+    function pad2(n) {
       return String(n).padStart(2, "0");
     }
 
@@ -61,14 +196,16 @@
       let ms = target - now;
       if (ms < 0) ms = 0;
 
-      const totalMin = Math.floor(ms / 60000);
-      const days = Math.floor(totalMin / (60 * 24));
-      const hours = Math.floor((totalMin % (60 * 24)) / 60);
-      const minutes = totalMin % 60;
+      const totalSec = Math.floor(ms / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const minutes = Math.floor((totalSec % 3600) / 60);
+      const seconds = totalSec % 60;
 
-      const el = document.getElementById("countdown");
-      el.textContent =
-        days + "d " + pad(hours) + "h " + pad(minutes) + "m";
+      document.getElementById("val-days").textContent = String(days);
+      document.getElementById("val-hours").textContent = pad2(hours);
+      document.getElementById("val-minutes").textContent = pad2(minutes);
+      document.getElementById("val-seconds").textContent = pad2(seconds);
     }
 
     tick();
