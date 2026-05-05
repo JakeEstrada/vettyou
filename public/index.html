@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coming Soon</title>
+  <title>Count Down</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -122,11 +122,14 @@
       text-align: center;
     }
     .footer {
-      font-size: clamp(0.58rem, 1.8vw, 0.68rem);
+      font-size: clamp(0.58rem, 1.8vw, 0.72rem);
       font-weight: 600;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.12em;
       color: #d4a017;
       opacity: 0.95;
+      text-align: center;
+      max-width: 22rem;
+      line-height: 1.5;
     }
     @media (max-width: 520px) {
       .timer {
@@ -141,7 +144,7 @@
 </head>
 <body>
   <main class="page">
-    <h1 class="title">COMING SOON ....</h1>
+    <h1 class="title">COUNT DOWN ....</h1>
 
     <div class="timer" role="timer" aria-live="polite" aria-atomic="true">
       <div class="unit">
@@ -170,7 +173,7 @@
       </div>
     </div>
 
-    <p class="footer">UNTIL SATURDAY</p>
+    <p class="footer">until saturday sleep over !!!</p>
   </main>
   <script>
     function nextSaturdayStart() {
