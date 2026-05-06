@@ -3,15 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Count Down</title>
-  <meta property="og:title" content="Count Down" />
+  <title>Rock ’n’ Roll Half Marathon — Count Down</title>
+  <meta property="og:title" content="Rock ’n’ Roll Half Marathon — Count Down" />
+  <meta property="og:description" content="Countdown to the Rock ’n’ Roll Half Marathon on May 31." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/clock.png" />
+  <meta property="og:image" content="/Marathon.png" />
   <meta property="og:image:type" content="image/png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Count Down" />
-  <meta name="twitter:image" content="/clock.png" />
-  <link rel="icon" type="image/png" href="/clock.png" />
+  <meta name="twitter:title" content="Rock ’n’ Roll Half Marathon — Count Down" />
+  <meta name="twitter:description" content="Countdown to the Rock ’n’ Roll Half Marathon on May 31." />
+  <meta name="twitter:image" content="/Marathon.png" />
+  <link rel="icon" type="image/png" href="/Marathon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -46,6 +48,17 @@
       text-indent: 0.38em;
       text-align: center;
       color: #fff;
+    }
+    .subtitle {
+      font-size: clamp(0.68rem, 2.1vw, 0.9rem);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-indent: 0.14em;
+      text-align: center;
+      color: #d4a017;
+      max-width: 28rem;
+      line-height: 1.65;
+      margin-top: -0.75rem;
     }
     .timer {
       display: flex;
@@ -136,7 +149,7 @@
       color: #d4a017;
       opacity: 0.95;
       text-align: center;
-      max-width: 22rem;
+      max-width: 26rem;
       line-height: 1.5;
     }
     @media (max-width: 520px) {
@@ -153,6 +166,9 @@
 <body>
   <main class="page">
     <h1 class="title">COUNT DOWN ....</h1>
+    <p class="subtitle">
+      ROCK ’N’ ROLL HALF MARATHON · MAY 31
+    </p>
 
     <div class="timer" role="timer" aria-live="polite" aria-atomic="true">
       <div class="unit">
@@ -181,20 +197,21 @@
       </div>
     </div>
 
-    <p class="footer">until saturday sleep over !!!</p>
+    <p class="footer">Race day May 31 · Timer hits zero right after that day ends (your local time)</p>
   </main>
   <script>
-    function nextSaturdayStart() {
+    /**
+     * Countdown to the instant June 1 begins locally after May 31 race day,
+     * so all of May 31 still shows time remaining (then rolls to next year).
+     */
+    function halfMarathonTarget() {
       const now = new Date();
-      let t = new Date(now);
-      t.setHours(0, 0, 0, 0);
-      const dow = t.getDay();
-      const daysUntilSat = (6 - dow + 7) % 7;
-      t.setDate(t.getDate() + daysUntilSat);
-      if (t < now) {
-        t.setDate(t.getDate() + 7);
+      const year = now.getFullYear();
+      let target = new Date(year, 5, 1, 0, 0, 0, 0);
+      if (target <= now) {
+        target = new Date(year + 1, 5, 1, 0, 0, 0, 0);
       }
-      return t;
+      return target;
     }
 
     function pad2(n) {
@@ -202,7 +219,7 @@
     }
 
     function tick() {
-      const target = nextSaturdayStart();
+      const target = halfMarathonTarget();
       const now = new Date();
       let ms = target - now;
       if (ms < 0) ms = 0;
@@ -213,7 +230,8 @@
       const minutes = Math.floor((totalSec % 3600) / 60);
       const seconds = totalSec % 60;
 
-      document.getElementById("val-days").textContent = String(days);
+      document.getElementById("val-days").textContent =
+        days >= 100 ? String(days) : pad2(days);
       document.getElementById("val-hours").textContent = pad2(hours);
       document.getElementById("val-minutes").textContent = pad2(minutes);
       document.getElementById("val-seconds").textContent = pad2(seconds);
