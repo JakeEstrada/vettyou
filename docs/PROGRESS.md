@@ -33,9 +33,9 @@ Update at the end of every working session. Newest entry on top.
 
 - **Done:** GitHub `JakeEstrada/vettyou` `main` now holds this Angular + Spring Boot project. Marathon countdown files are gone from the current tree. Personal files (resume PDF, job history JSON, mailbox `.env`) stay local.
 - **Files changed:** `.gitignore`, first product commit of `backend/`, `frontend/`, `docs/`, `infra/`, `.github/`.
-- **Decisions:** Normal push, not a history rewrite. Old Marathon commits remain in git history. Do not connect Vercel to GitHub until the live `main` tree is Vettyou (this commit).
-- **Tests run / results:** Not re-run this step. Verified no `.env` or personal artifacts were staged.
-- **Next step:** Connect the Vercel project to this GitHub repo with Root Directory `frontend`.
+- **Decisions:** Normal push, not a history rewrite. Old Marathon commits remain in git history. Vercel Root Directory is `frontend`.
+- **Tests run / results:** Not re-run this step. Verified no `.env` or personal artifacts were staged. GitHub `main` tree is backend/frontend/docs (no Marathon files). GitHub Pages was not enabled.
+- **Next step:** Host Spring Boot + Postgres (Render) and point www.vettyou.com at it. Login on production still needs the API.
 
 ### 2026-11-08: New Vercel project for the Angular app at www.vettyou.com
 
