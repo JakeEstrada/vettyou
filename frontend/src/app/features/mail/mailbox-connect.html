@@ -1,0 +1,117 @@
+<section class="mailbox" aria-labelledby="mail-connect-heading">
+  <h2 id="mail-connect-heading" class="sr-only">Mailbox connection</h2>
+  @if (loading()) {
+    <p class="hint" role="status">Checking mailbox…</p>
+  } @else if (connection()?.connected) {
+    <p class="hint">
+      Connected as <strong>{{ connection()?.email }}</strong>. Each line is classified from the message. Click a line to
+      open it. Status does not change until you confirm.
+    </p>
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+    <div class="actions">
+      <button type="button" class="btn" [disabled]="syncing()" (click)="sync()">
+        {{ syncing() ? 'Reading mail…' : 'Read mail' }}
+      </button>
+      <button type="button" class="btn ghost" [disabled]="disconnecting()" (click)="disconnect()">
+        {{ disconnecting() ? 'Disconnecting…' : 'Disconnect' }}
+      </button>
+    </div>
+    @if (messages().length === 0) {
+      <p class="hint">No messages yet. Read mail to pull applications and replies.</p>
+    } @else {
+      <ul class="inbox">
+        @for (item of messages(); track item.id) {
+          <li [class.open]="opened() === item.id">
+            <button
+              type="button"
+              class="row"
+              [attr.aria-expanded]="opened() === item.id"
+              (click)="toggle(item.id)"
+            >
+              <span class="when">{{ when(item.sentAt) }}</span>
+              <span class="kind">{{ label(item.category) }}</span>
+              <span class="job">{{ job(item) }}</span>
+              <span class="who">{{ company(item) }}</span>
+            </button>
+            @if (opened() === item.id) {
+              <div class="letter">
+                <p class="meta">{{ item.fromName || item.fromAddress }} · {{ item.subject || '(no subject)' }}</p>
+                @if (item.quote) {
+                  <blockquote>{{ item.quote }}</blockquote>
+                } @else if (item.snippet) {
+                  <p class="meta">{{ item.snippet }}</p>
+                }
+                <div class="actions">
+                  <button type="button" class="btn small" [disabled]="working() === item.id" (click)="accept(item)">
+                    {{ working() === item.id ? 'Saving…' : item.proposedApplicationId ? 'Save to ' + item.proposedTitle : 'Track this' }}
+                  </button>
+                  <button type="button" class="btn ghost small" [disabled]="working() === item.id" (click)="ignore(item)">
+                    Not a job email
+                  </button>
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <p class="hint">
+      Connect the mailbox you apply from. Namecheap Private Email uses <code>mail.privateemail.com</code> on port 993.
+      After that, Read mail classifies applications and replies. The password is stored encrypted on the server and
+      never shown again.
+    </p>
+    <form class="form" [formGroup]="form" (ngSubmit)="connect()" novalidate>
+      <label>
+        Email
+        <input
+          id="mailbox-email"
+          type="email"
+          formControlName="email"
+          autocomplete="username"
+          placeholder="contact@jakeestrada.org"
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+        />
+        @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
+          <span class="field-error">Email is required.</span>
+        } @else if (form.controls.email.touched && form.controls.email.errors?.['email']) {
+          <span class="field-error">Enter a valid email.</span>
+        }
+      </label>
+      <label>
+        Password
+        <input
+          id="mailbox-password"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+        />
+        @if (form.controls.password.touched && form.controls.password.errors?.['required']) {
+          <span class="field-error">Password is required.</span>
+        } @else if (form.controls.password.errors?.['server']) {
+          <span class="field-error">{{ form.controls.password.errors?.['server'] }}</span>
+        }
+      </label>
+      <label>
+        IMAP host
+        <input id="mailbox-host" type="text" formControlName="host" autocomplete="off" />
+        @if (form.controls.host.touched && form.controls.host.errors?.['required']) {
+          <span class="field-error">Host is required.</span>
+        } @else if (form.controls.host.errors?.['server']) {
+          <span class="field-error">{{ form.controls.host.errors?.['server'] }}</span>
+        }
+      </label>
+      <label>
+        Port
+        <input id="mailbox-port" type="number" formControlName="port" min="1" max="65535" />
+      </label>
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+      <button type="submit" class="btn" [disabled]="saving()">{{ saving() ? 'Connecting…' : 'Connect email' }}</button>
+    </form>
+  }
+</section>

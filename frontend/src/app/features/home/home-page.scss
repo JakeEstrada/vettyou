@@ -1,0 +1,183 @@
+:host {
+  display: block;
+}
+
+.home {
+  max-width: 86rem;
+  margin: 0 auto;
+}
+
+.lede {
+  text-align: center;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.stage {
+  background: #d8d3cb;
+  padding: 1.6rem 1rem 2rem;
+  overflow: auto;
+}
+
+.identity {
+  padding: 0.2rem 0.2rem 1rem;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.role {
+  margin: 0.15rem 0 0.8rem;
+  color: var(--color-copper);
+  font-size: 1.05rem;
+}
+
+.fine,
+.muted {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.skill-list {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.skill-list > li {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.sources {
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.band {
+  margin-top: 2.2rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--color-line);
+}
+
+.band h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.2rem;
+}
+
+.job-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.job-tabs button {
+  text-align: left;
+  border: 1px solid var(--color-line);
+  background: transparent;
+  color: var(--color-ink);
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.job-tabs button span {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.job-tabs button[aria-current='true'] {
+  border-color: var(--color-copper);
+}
+
+.job-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(14rem, 0.8fr);
+  gap: 1.2rem;
+}
+
+.estimate {
+  margin: 0.3rem 0;
+  color: var(--color-copper);
+  font-size: 1.05rem;
+}
+
+.posting {
+  max-height: 22rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  background: var(--color-field);
+  border: 1px solid var(--color-line);
+  padding: 0.8rem;
+  font: inherit;
+  color: var(--color-ink);
+}
+
+.job-grid label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.job-grid textarea {
+  width: 100%;
+  padding: 0.6rem;
+  color: var(--color-ink);
+  background: var(--color-field);
+  border: 1px solid var(--color-line);
+  color-scheme: dark;
+  font: inherit;
+}
+
+.job-grid a {
+  margin-right: 0.9rem;
+}
+
+.missing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+
+.missing li {
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  padding: 0.15rem 0.45rem;
+  font-size: 0.85rem;
+}
+
+.mail p {
+  max-width: 40rem;
+}
+
+@media (max-width: 960px) {
+  .hero,
+  .job-grid {
+    grid-template-columns: 1fr;
+  }
+}

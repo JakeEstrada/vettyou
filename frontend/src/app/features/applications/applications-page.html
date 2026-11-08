@@ -1,0 +1,13 @@
+<section class="page wide" aria-labelledby="applications-heading">
+  <h1 id="applications-heading">Applications</h1>
+  <p class="lede">Status is saved from confirmed mail on <a routerLink="/mailbox">Email</a>.</p>
+  @if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to track applications.</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <app-application-tracker [items]="items()" [openings]="openings()" />
+  }
+</section>

@@ -1,0 +1,120 @@
+:host {
+  display: block;
+}
+
+details {
+  margin: 0;
+}
+
+summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.skill {
+  overflow-wrap: anywhere;
+}
+
+.status {
+  flex-shrink: 0;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--color-line);
+  font-size: 0.8rem;
+}
+
+summary .status.direct,
+.status.met {
+  border-color: var(--color-copper);
+  background: var(--color-copper);
+  color: #121418;
+}
+
+.status.partial,
+.status.direct,
+.status.transferable {
+  border-color: var(--color-copper);
+  color: var(--color-copper);
+}
+
+.status.unconfirmed,
+.status.unclear {
+  border-style: dashed;
+  color: var(--color-ink);
+}
+
+.status.not_shown,
+.status.changed,
+.muted {
+  color: var(--color-muted);
+}
+
+.status.gap {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+p {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.note {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.ink {
+  color: var(--color-ink);
+}
+
+.parts {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  padding: 0 0 0 0.75rem;
+  border-left: 1px solid var(--color-line);
+  list-style: none;
+}
+
+.part-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.cite {
+  margin: 0.4rem 0 0;
+}
+
+blockquote {
+  margin: 0.25rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-copper);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--color-muted);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

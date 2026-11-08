@@ -1,0 +1,32 @@
+<section class="page" aria-labelledby="projects-heading">
+  <h1 id="projects-heading">Projects</h1>
+  <p class="lede">Drop in a project's README. We pull out the name, the stack, and what you built.</p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to add a project.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading projects…</p>
+  } @else {
+    <app-readme-drop
+      label="Drop a README.md here to create a project"
+      [busy]="importing()"
+      (picked)="importReadme($event)"
+    />
+    @if (importError()) {
+      <p class="form-error center" role="alert">{{ importError() }}</p>
+    }
+    @if (loadError()) {
+      <p class="form-error center" role="alert">{{ loadError() }}</p>
+    }
+
+    @if (projects().length > 0) {
+      <div class="section">
+        <h2>Your projects</h2>
+        <ul class="list">
+          @for (project of projects(); track project.id) {
+            <li><a class="btn ghost" [routerLink]="['/projects', project.id]">{{ project.name }}</a></li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</section>

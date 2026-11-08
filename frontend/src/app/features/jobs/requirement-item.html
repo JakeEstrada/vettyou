@@ -1,0 +1,66 @@
+@let requirement = item();
+<details>
+  <summary>
+    <span class="skill">{{ requirement.skill }}</span>
+    <span [class]="'status ' + requirement.status">{{ statusLabels[requirement.status] }}</span>
+  </summary>
+  <p class="note">{{ requirement.note }}</p>
+  <ul class="parts">
+    @for (part of requirement.parts; track $index) {
+      <li>
+        <p class="part-head">
+          <span>{{ part.text }}</span>
+          <span [class]="'status ' + part.status">{{ partLabels[part.status] }}</span>
+          @if (part.sharedBy > 1) {
+            <span class="muted">same idea in {{ part.sharedBy }} items</span>
+          }
+        </p>
+        @if (part.reason) {
+          <p class="muted">{{ part.reason }}</p>
+        }
+        @for (cite of part.evidence; track $index) {
+          <p class="cite">
+            <a [routerLink]="link(cite)">{{ cite.label }}</a>
+            @if (!cite.confirmed) {
+              <span class="tag">not confirmed yet</span>
+            }
+          </p>
+          <blockquote>“{{ cite.excerpt }}”</blockquote>
+        }
+      </li>
+    }
+  </ul>
+  @if (requirement.weight !== null) {
+    <p class="muted">
+      Credit {{ number(requirement.credit) }}
+      @if (requirement.creditIfConfirmed !== requirement.credit) {
+        ({{ number(requirement.creditIfConfirmed) }} if confirmed)
+      }
+      × weight {{ number(requirement.weight) }}
+      @if (requirement.strength !== null) {
+        · evidence strength {{ number(requirement.strength) }}
+      }
+    </p>
+  }
+  <p class="muted"><span class="ink">Posting says:</span> “{{ requirement.quote }}”</p>
+  <div class="answers">
+    @if (requirement.answer) {
+      <span>You said: {{ requirement.answer === 'meets' ? 'I meet this' : "I don't have this" }}</span>
+      <button type="button" class="btn ghost small" [disabled]="saving()" (click)="answered.emit(null)">
+        Undo <span class="sr-only">answer for {{ requirement.skill }}</span>
+      </button>
+    } @else {
+      @if (requirement.canMarkMet) {
+        <button type="button" class="btn ghost small" [disabled]="saving()" (click)="answered.emit('meets')">
+          I meet this <span class="sr-only">: {{ requirement.skill }}</span>
+        </button>
+      }
+      <button type="button" class="btn ghost small" [disabled]="saving()" (click)="answered.emit('gap')">
+        I don't have this <span class="sr-only">: {{ requirement.skill }}</span>
+      </button>
+    }
+    <button type="button" class="link" (click)="removed.emit()">
+      Not a real requirement <span class="sr-only">: {{ requirement.skill }}</span>
+    </button>
+  </div>
+</details>

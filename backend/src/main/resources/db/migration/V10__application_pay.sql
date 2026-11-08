@@ -1,0 +1,2 @@
+ALTER TABLE applications
+    ADD COLUMN pay TEXT NOT NULL DEFAULT '';

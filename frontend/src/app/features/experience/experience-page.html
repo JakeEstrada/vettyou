@@ -1,0 +1,78 @@
+<section class="page" aria-labelledby="experience-heading">
+  <h1 id="experience-heading">Experience</h1>
+  <p class="lede">Every job, with everything you did there. Write it the way you would say it.</p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to save a job.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading jobs…</p>
+  } @else {
+    @if (jobs().length > 0) {
+      <ul class="list">
+        @for (job of jobs(); track job.id) {
+          <li>
+            <a class="btn ghost job" [routerLink]="['/experience', job.id]">
+              <span>{{ job.title }} at {{ job.employer }}</span>
+              @if (when(job)) {
+                <span class="when">{{ when(job) }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    } @else if (!writing()) {
+      <p class="lede">No jobs yet. <a routerLink="/resume">Upload a resume</a> or add one by hand.</p>
+    }
+    @if (!writing()) {
+      <p class="lede"><button type="button" class="btn" (click)="add()">Add a job</button></p>
+    } @else {
+      <form class="form wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label>
+          Employer
+          <input type="text" formControlName="employer" />
+          @if (form.controls.employer.touched && form.controls.employer.errors?.['required']) {
+            <span class="field-error">Employer is required.</span>
+          }
+        </label>
+        <label>
+          Job title
+          <input type="text" formControlName="title" />
+          @if (form.controls.title.touched && form.controls.title.errors?.['required']) {
+            <span class="field-error">Job title is required.</span>
+          }
+        </label>
+        <label>
+          Where
+          <input type="text" formControlName="location" />
+        </label>
+        <label>
+          Started
+          <input type="date" formControlName="startDate" />
+        </label>
+        @if (!form.controls.current.value) {
+          <label>
+            Ended
+            <input type="date" formControlName="endDate" />
+            @if (form.controls.endDate.errors?.['server']) {
+              <span class="field-error">{{ form.controls.endDate.errors?.['server'] }}</span>
+            }
+          </label>
+        }
+        <label class="check">
+          <input type="checkbox" formControlName="current" />
+          I still work here
+        </label>
+        <label>
+          What you did, one line per point
+          <textarea formControlName="body"></textarea>
+          @if (form.controls.body.touched && form.controls.body.errors?.['required']) {
+            <span class="field-error">Write what you did.</span>
+          }
+        </label>
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        <button type="submit">Save job</button>
+      </form>
+    }
+  }
+</section>

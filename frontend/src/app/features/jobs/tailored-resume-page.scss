@@ -1,0 +1,235 @@
+@use "../../../styles/detail";
+
+.center {
+  text-align: center;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 0 var(--space-2);
+}
+
+.toolbar a.btn {
+  text-decoration: none;
+}
+
+.version {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.version select {
+  padding: 0.55rem 0.6rem;
+  color: var(--color-ink);
+  background: var(--color-field);
+  border: 1px solid var(--color-line);
+  font: inherit;
+  color-scheme: dark;
+}
+
+.notice {
+  max-width: 32rem;
+  margin: var(--space-2) auto 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--color-copper);
+  font-size: 0.9rem;
+}
+
+.notice p,
+.notice ul {
+  margin: 0.25rem 0;
+}
+
+.score {
+  max-width: 32rem;
+  margin: var(--space-3) auto 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+  text-align: center;
+}
+
+.total {
+  margin: 0;
+}
+
+.number {
+  font-size: 3.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--color-copper);
+}
+
+.out-of {
+  margin-left: 0.25rem;
+  color: var(--color-muted);
+}
+
+.label {
+  margin: 0 0 var(--space-1);
+  font-weight: 560;
+}
+
+.compare {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.factors {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  text-align: left;
+}
+
+.factors dt {
+  font-size: 0.9rem;
+}
+
+.factors dd {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+}
+
+.factors dd.explain,
+.formula {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.factors .left-out {
+  opacity: 0.7;
+}
+
+.weight {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.bar {
+  flex: 1;
+  height: 0.4rem;
+  background: var(--color-line);
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-copper);
+}
+
+.formula {
+  margin: var(--space-2) 0 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.formula span {
+  color: var(--color-ink);
+}
+
+.section h3 {
+  margin: var(--space-2) 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 560;
+}
+
+.read-checks,
+.lines,
+.chips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.read-checks li {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.read-checks .mark {
+  color: var(--color-copper);
+}
+
+.read-checks .failed .mark {
+  color: var(--color-danger);
+}
+
+.read-checks .detail {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.preview {
+  margin: 0;
+}
+
+.preview a {
+  display: block;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.preview figcaption {
+  margin: var(--space-1) 0 0;
+}
+
+.lines li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-line);
+  overflow-wrap: anywhere;
+}
+
+.lines .text {
+  margin: 0;
+}
+
+.lines .why {
+  margin: 0.2rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.lines .backs {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.lines .backs li {
+  padding: 0;
+  border: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chips li {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-line);
+  font-size: 0.9rem;
+}
+
+.importance {
+  margin-left: 0.3rem;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}

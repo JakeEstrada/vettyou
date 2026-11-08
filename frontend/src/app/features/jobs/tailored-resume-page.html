@@ -1,0 +1,309 @@
+<section class="page" aria-labelledby="resume-heading">
+  <p class="back"><a [routerLink]="['/jobs', postingId()]">← Back to the match</a></p>
+  <h1 id="resume-heading">Tailored resume</h1>
+
+  @if (loadError()) {
+    <p class="form-error" role="alert">{{ loadError() }}</p>
+  } @else if (!loaded()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else {
+    @if (posting(); as posting) {
+      <p class="lede">
+        For {{ posting.title || 'this posting' }}
+        @if (posting.company) {
+          at {{ posting.company }}
+        }
+      </p>
+    }
+
+    <div class="toolbar">
+      @if (versions().length > 0) {
+        <label class="version">
+          Version
+          <select [formControl]="version">
+            @for (summary of versions(); track summary.id) {
+              <option [value]="summary.id">
+                {{ summary.version }} · {{ summary.createdAt | date: 'MMM d, h:mm a' }}@if (summary.total !== null) { · {{ summary.total }}/100}
+              </option>
+            }
+          </select>
+        </label>
+      }
+      <button type="button" class="btn" [disabled]="building() || !canBuild()" (click)="build()">
+        @if (building()) {
+          Building…
+        } @else if (versions().length > 0) {
+          Build a new version
+        } @else {
+          Build the resume
+        }
+      </button>
+      @if (resume()) {
+        <a class="btn ghost" [href]="pdfUrl()" download>Download PDF</a>
+      }
+    </div>
+
+    @if (building()) {
+      <p class="hint center" role="status">Picking your lines, fitting them on one page, and reading the PDF back…</p>
+    } @else if (!canBuild()) {
+      <p class="hint center" role="status">
+        The posting has to finish reading before a resume can be built. Check its
+        <a [routerLink]="['/jobs', postingId()]">match page</a>.
+      </p>
+    }
+    @if (actionError()) {
+      <p class="form-error center" role="alert">{{ actionError() }}</p>
+    }
+
+    @if (versions().length === 0) {
+      <section class="section" aria-labelledby="how-heading">
+        <h2 id="how-heading">How it is built</h2>
+        <ul class="bullets">
+          <li>Only lines you confirmed, from your jobs, projects, and education. Nothing is copied from the posting.</li>
+          <li>
+            Lines that cover more of the posting come first. Every job stays, in date order, and gets a line before any
+            project does.
+          </li>
+          <li>
+            Up to three projects that show the most of the posting get their own section, two lines each, even when a
+            job shows the same thing.
+          </li>
+          <li>
+            Skills you kept use the posting's spelling only when it is the same product, like PostgreSQL for Postgres.
+            Skills you don't have are never added.
+          </li>
+          <li>One page, one column. The PDF's text is read back to check it and to score it again.</li>
+          <li>Each build is saved as its own version and never changes afterwards.</li>
+        </ul>
+      </section>
+    } @else if (opening() && !resume()) {
+      <p class="hint center" role="status">Opening the resume…</p>
+    }
+
+    @if (resume(); as resume) {
+      @if (resume.stale) {
+        <div class="notice" role="status">
+          <p>This version no longer matches your data. It stays exactly as it was built.</p>
+          <ul>
+            @for (reason of resume.staleReasons; track reason) {
+              <li>{{ reason }}</li>
+            }
+          </ul>
+          <p>Build a new version to use your latest data.</p>
+        </div>
+      }
+
+      <section class="score" aria-labelledby="score-heading">
+        <h2 id="score-heading" class="sr-only">Vettyou estimate for this resume</h2>
+        @if (resume.score.total !== null) {
+          <p class="total">
+            <span class="number">{{ resume.score.total }}</span><span class="out-of">/100</span>
+          </p>
+        } @else {
+          <p class="total"><span class="out-of">Nothing can be scored yet</span></p>
+        }
+        <p class="label">{{ resume.score.label }} for this resume</p>
+        <p class="hint">{{ resume.score.note }}</p>
+        @if (resume.evidenceTotal !== null) {
+          <p class="compare">
+            All your saved evidence scored {{ resume.evidenceTotal }}/100 when this version was built. A resume only
+            counts what it shows, and readability only counts on a resume.
+          </p>
+        }
+        <dl class="factors">
+          @for (factor of resume.score.factors; track factor.key) {
+            <div [class.left-out]="factor.value === null">
+              <dt>
+                {{ factor.label }} <span class="weight">{{ weight(factor) }}</span>
+              </dt>
+              <dd>
+                <span class="bar" aria-hidden="true"><span [style.width.%]="(factor.value ?? 0) * 100"></span></span>
+                {{ percent(factor.value) }} · {{ points(factor) }}
+              </dd>
+              <dd class="explain">{{ factor.how }}</dd>
+            </div>
+          }
+        </dl>
+        <p class="formula"><span>How it adds up:</span> {{ resume.score.formula }}</p>
+      </section>
+
+      <section class="section" aria-labelledby="checks-heading">
+        <h2 id="checks-heading">
+          Readability checks <span class="count">{{ passed() }} of {{ resume.checks.length }} passed</span>
+        </h2>
+        <p class="hint">Vettyou read the text back out of the PDF, the way an applicant tracking system would.</p>
+        <ul class="read-checks">
+          @for (check of resume.checks; track check.key) {
+            <li [class.failed]="!check.passed">
+              <span class="mark" aria-hidden="true">{{ check.passed ? '✓' : '✗' }}</span>
+              <span>
+                {{ check.label }}<span class="sr-only">: {{ check.passed ? 'passed' : 'failed' }}</span>
+                @if (check.detail) {
+                  <span class="detail">{{ check.detail }}</span>
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="section" aria-labelledby="preview-heading">
+        <h2 id="preview-heading">Preview</h2>
+        <figure class="preview">
+          <a [href]="pdfUrl()" target="_blank" rel="noopener">
+            <img
+              [src]="previewUrl()"
+              width="850"
+              height="1100"
+              alt="Page 1 of the resume. Its text is listed below under What an applicant tracking system reads."
+            />
+          </a>
+          <figcaption class="hint">
+            Page 1 as the PDF draws it.
+            @if (resume.pages === 1) {
+              It fits on one page.
+            } @else {
+              It runs to {{ resume.pages }} pages.
+            }
+            Select it to open the PDF in a new tab.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="section" aria-labelledby="on-heading">
+        <h2 id="on-heading">What's on it and why <span class="count">{{ resume.lines.length }}</span></h2>
+        @if (resume.lines.length === 0) {
+          <p class="hint">
+            None of your confirmed lines fit this posting yet. Confirm lines on your project pages or add a job or
+            project line that shows what the posting asks for.
+          </p>
+        } @else {
+          <ul class="lines">
+            @for (line of resume.lines; track $index) {
+              <li>
+                <p class="text">{{ line.text }}</p>
+                @if (line.backs.length > 0) {
+                  <ul class="backs" aria-label="What this line shows">
+                    @for (backed of backs(line); track backed.key) {
+                      <li>
+                        {{ backed.requirement }} ({{ backed.group }})@if (backed.parts) {<span>: {{ backed.parts }}</span>}
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="why">Fills out this job. It doesn't cover anything the posting asks for.</p>
+                }
+                <p class="why">From <a [routerLink]="link({ kind: line.kind, id: line.sourceId })">{{ line.label }}</a>.</p>
+              </li>
+            }
+          </ul>
+        }
+        @if (resume.skills.length > 0) {
+          <h3>Skills section</h3>
+          <p class="hint">Only skills you kept. A skill uses the posting's spelling only when it is the same product.</p>
+          <ul class="chips">
+            @for (skill of resume.skills; track skill.name) {
+              <li>
+                {{ skill.shown }}
+                @if (skill.shown !== skill.name) {
+                  <span class="importance">your "{{ skill.name }}", spelled as the posting does</span>
+                } @else if (skill.asked) {
+                  <span class="importance">named in the posting</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      @if (resume.suggestions.length > 0) {
+        <section class="section" aria-labelledby="change-heading">
+          <h2 id="change-heading">Ways to improve it <span class="count">{{ resume.suggestions.length }}</span></h2>
+          <ul class="lines">
+            @for (suggestion of resume.suggestions; track $index) {
+              <li>
+                <p class="text">{{ suggestion.text }}</p>
+                @if (suggestion.line) {
+                  <p class="why">
+                    "{{ suggestion.line }}"
+                    @if (suggestionLink(suggestion); as target) {
+                      <a [routerLink]="target">Open it</a>
+                    }
+                  </p>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (resume.workOn.length > 0) {
+        <section class="section" aria-labelledby="work-heading">
+          <h2 id="work-heading">Work on outside the resume <span class="count">{{ resume.workOn.length }}</span></h2>
+          <p class="hint">The posting asks for these and the resume doesn't claim them. Each one says why.</p>
+          <ul class="lines">
+            @for (item of resume.workOn; track $index) {
+              <li>
+                <p class="text">{{ item.part || item.requirement }}</p>
+                <p class="why">
+                  @if (partOf(item); as requirement) {
+                    Part of {{ requirement }}.
+                  }
+                  {{ item.reason }}
+                </p>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (resume.leftOff.length > 0 || resume.skillsLeftOff.length > 0) {
+        <section class="section" aria-labelledby="left-heading">
+          <h2 id="left-heading">
+            Left off <span class="count">{{ resume.leftOff.length + resume.skillsLeftOff.length }}</span>
+          </h2>
+          <details>
+            <summary>Show what was left off and why</summary>
+            <ul class="lines">
+              @for (line of resume.leftOff; track $index) {
+                <li>
+                  <p class="text">{{ line.text }}</p>
+                  <p class="why">
+                    {{ reason(line) }}. From
+                    <a [routerLink]="link({ kind: line.kind, id: line.sourceId })">{{ line.label }}</a>.
+                  </p>
+                </li>
+              }
+              @for (skill of resume.skillsLeftOff; track skill.name) {
+                <li>
+                  <p class="text">{{ skill.shown }}</p>
+                  <p class="why">A kept skill that didn't fit on one page.</p>
+                </li>
+              }
+            </ul>
+          </details>
+        </section>
+      }
+
+      <section class="section" aria-labelledby="coverage-heading">
+        <h2 id="coverage-heading">How this resume covers the posting</h2>
+        @for (group of coverage(); track group.status) {
+          <h3>{{ group.label }} <span class="count">{{ group.items.length }}</span></h3>
+          <ul class="chips">
+            @for (item of group.items; track item.id) {
+              <li>{{ item.skill }}</li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="section" aria-labelledby="text-heading">
+        <h2 id="text-heading">What an applicant tracking system reads</h2>
+        <details>
+          <summary>Show the text read back from the PDF</summary>
+          <pre>{{ resume.plainText }}</pre>
+        </details>
+      </section>
+    }
+  }
+</section>

@@ -1,0 +1,122 @@
+<section class="home" aria-labelledby="home-heading">
+  <h1 id="home-heading" class="sr-only">Home</h1>
+  @if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else if (missing()) {
+    <p class="lede">Your experience, in your words.</p>
+    <p class="lede"><a routerLink="/register">Create an account</a> or <a routerLink="/login">log in</a>.</p>
+  } @else {
+    <div class="hero">
+      <div class="stage">
+        <app-resume-sheet [model]="sheet()" [marks]="marks()" />
+      </div>
+      <aside class="identity">
+        <p class="name">{{ profile()?.displayName || 'Your name' }}</p>
+        @if (role()) {
+          <p class="role">{{ role() }}</p>
+        } @else {
+          <p class="role muted">Add a job title on your resume.</p>
+        }
+        <p class="fine">Kept skills, with the job or project they came from. Nothing is invented.</p>
+        @if (topSkills().length === 0) {
+          <p class="muted">Keep skills on a project or name them in a job write-up.</p>
+        } @else {
+          <ul class="skill-list">
+            @for (skill of topSkills(); track skill.name) {
+              <li>
+                <strong>{{ skill.name }}</strong>
+                <span class="muted">{{ skill.places }} {{ skill.places === 1 ? 'place' : 'places' }}</span>
+                <ul class="sources">
+                  @for (source of skill.sources; track source.label) {
+                    <li><a [routerLink]="source.link">{{ source.label }}</a></li>
+                  }
+                </ul>
+              </li>
+            }
+          </ul>
+        }
+        <p class="links">
+          <a routerLink="/resume" [queryParams]="{ view: 'master' }">Edit resume</a>
+          <a routerLink="/skills">All skills</a>
+        </p>
+      </aside>
+    </div>
+
+    <section class="band" aria-labelledby="jobs-heading">
+      <h2 id="jobs-heading">Recent jobs</h2>
+      @if (recents().length === 0) {
+        <p class="muted">No postings yet. <a routerLink="/jobs">Paste a job</a>.</p>
+      } @else {
+        <ul class="job-tabs">
+          @for (item of recents(); track item.postingId) {
+            <li>
+              <button
+                type="button"
+                [attr.aria-current]="selected()?.id === item.postingId ? 'true' : null"
+                (click)="openJob(item)"
+              >
+                {{ item.title }}
+                @if (item.company) {
+                  <span>{{ item.company }}</span>
+                }
+                @if (item.total !== null) {
+                  <span>Vettyou estimate {{ item.total }}/100</span>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (selected(); as posting) {
+        <div class="job-grid">
+          <article>
+            <h3>{{ posting.title || 'Job posting' }}</h3>
+            @if (posting.company) {
+              <p class="muted">{{ posting.company }}</p>
+            }
+            @if (selectedTotal() !== null) {
+              <p class="estimate">Vettyou estimate {{ selectedTotal() }}/100</p>
+            }
+            <p class="fine">Our reading of the posting against your lines. Not an employer's applicant tracking score.</p>
+            <h4>Job description</h4>
+            <pre class="posting">{{ posting.body }}</pre>
+            <p>
+              <a [routerLink]="['/jobs', posting.id]">Open the match</a>
+              <a [routerLink]="['/jobs', posting.id, 'resume']">Tailored resume</a>
+            </p>
+          </article>
+          <article>
+            <label>
+              Keywords
+              <textarea
+                [formControl]="keywords"
+                rows="4"
+                placeholder="React, PostgreSQL, Kubernetes"
+              ></textarea>
+            </label>
+            <p class="fine">Words you type are marked on the resume. Missing ones are listed here. They are not added to the resume.</p>
+            @if (marks().length === 0) {
+              <p class="muted">Type a word from the posting.</p>
+            } @else if (missingWords().length === 0) {
+              <p>Every typed word is already on the resume.</p>
+            } @else {
+              <p>Missing from the resume</p>
+              <ul class="missing">
+                @for (word of missingWords(); track word) {
+                  <li>{{ word }}</li>
+                }
+              </ul>
+            }
+          </article>
+        </div>
+      }
+    </section>
+
+    <section class="band">
+      <app-application-tracker [items]="applications()" [openings]="recents()" />
+    </section>
+  }
+</section>

@@ -1,0 +1,164 @@
+<article class="sheet">
+  <div class="mast">
+    <header>
+      <h2>{{ model().name || 'Name' }}</h2>
+      @if (model().tagline) {
+        <p class="tagline">{{ model().tagline }}</p>
+      }
+      @if (model().contact.length > 0) {
+        <p class="contact">
+          @for (part of model().contact; track $index) {
+            @if ($index > 0) {
+              <span class="sep" aria-hidden="true"></span>
+            }
+            <span>{{ part }}</span>
+          }
+        </p>
+      }
+    </header>
+  </div>
+
+  @if (model().jobs.length > 0) {
+    <section aria-label="Experience">
+      <h3>Professional Experience</h3>
+      @for (job of model().jobs; track $index) {
+        <article class="job">
+          <div class="row">
+            <div>
+              <span class="role">
+                @for (part of parts(job.title); track $index) {
+                  @if (part.hit) {
+                    <mark>{{ part.text }}</mark>
+                  } @else {
+                    {{ part.text }}
+                  }
+                }
+              </span>
+              @if (job.org) {
+                <span class="dot">·</span>
+                <span class="org">{{ job.org }}</span>
+              }
+            </div>
+            @if (job.dates) {
+              <span class="dates">{{ job.dates }}</span>
+            }
+          </div>
+          @if (job.subtitle) {
+            <p class="job-meta">{{ job.subtitle }}</p>
+          }
+          <ul>
+            @for (bullet of job.bullets; track $index) {
+              <li [class.hit]="why(bullet)" [class.on]="picked() === bullet && why(bullet)">
+                @if (why(bullet)) {
+                  <button type="button" (click)="choose(bullet)">
+                    @for (part of parts(bullet); track $index) {
+                      @if (part.hit) {
+                        <mark>{{ part.text }}</mark>
+                      } @else {
+                        {{ part.text }}
+                      }
+                    }
+                  </button>
+                } @else {
+                  @for (part of parts(bullet); track $index) {
+                    @if (part.hit) {
+                      <mark>{{ part.text }}</mark>
+                    } @else {
+                      {{ part.text }}
+                    }
+                  }
+                }
+              </li>
+            }
+          </ul>
+        </article>
+      }
+    </section>
+  }
+
+  @if (model().schools.length > 0) {
+    <section class="edu" aria-label="Education">
+      <h3>Education</h3>
+      @for (school of model().schools; track $index) {
+        <article class="job">
+          <div class="row">
+            <div>
+              <span class="role">{{ school.title }}</span>
+              @if (school.subtitle) {
+                <span class="dot">·</span>
+                <span class="org">{{ school.subtitle }}</span>
+              }
+            </div>
+            @if (school.dates) {
+              <span class="dates">{{ school.dates }}</span>
+            }
+          </div>
+        </article>
+      }
+    </section>
+  }
+
+  @if (model().skills.length > 0) {
+    <section aria-label="Skills">
+      <h3>Technical Skills</h3>
+      <dl class="skills">
+        @for (row of model().skills; track row.label) {
+          <dt>{{ row.label }}</dt>
+          <dd>
+            @for (part of parts(row.text); track $index) {
+              @if (part.hit) {
+                <mark>{{ part.text }}</mark>
+              } @else {
+                {{ part.text }}
+              }
+            }
+          </dd>
+        }
+      </dl>
+    </section>
+  }
+
+  @if (model().projects.length > 0) {
+    <section class="projects" aria-label="Projects">
+      <h3>Projects</h3>
+      @for (project of model().projects; track $index) {
+        <article class="job">
+          <div class="row">
+            <strong class="role">{{ project.title }}</strong>
+            @if (project.dates) {
+              <span class="dates">{{ project.dates }}</span>
+            }
+          </div>
+          @if (project.subtitle) {
+            <p class="job-meta">{{ project.subtitle }}</p>
+          }
+          <ul>
+            @for (bullet of project.bullets; track $index) {
+              <li [class.hit]="why(bullet)" [class.on]="picked() === bullet && why(bullet)">
+                @if (why(bullet)) {
+                  <button type="button" (click)="choose(bullet)">
+                    @for (part of parts(bullet); track $index) {
+                      @if (part.hit) {
+                        <mark>{{ part.text }}</mark>
+                      } @else {
+                        {{ part.text }}
+                      }
+                    }
+                  </button>
+                } @else {
+                  @for (part of parts(bullet); track $index) {
+                    @if (part.hit) {
+                      <mark>{{ part.text }}</mark>
+                    } @else {
+                      {{ part.text }}
+                    }
+                  }
+                }
+              </li>
+            }
+          </ul>
+        </article>
+      }
+    </section>
+  }
+</article>

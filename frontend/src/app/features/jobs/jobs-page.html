@@ -1,0 +1,70 @@
+<section class="page" aria-labelledby="jobs-heading">
+  <h1 id="jobs-heading">Job match</h1>
+  <p class="lede">
+    Paste a job posting. We split each requirement into its parts, look for your own lines that show each part, and
+    give a Vettyou estimate.
+  </p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to match a job.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else {
+    <form class="form wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label>
+        Job posting
+        <textarea formControlName="body" class="posting" placeholder="Paste the whole posting here"></textarea>
+        @if (form.controls.body.touched && form.controls.body.errors?.['required']) {
+          <span class="field-error">Paste the job posting.</span>
+        }
+        @if (form.controls.body.errors?.['maxlength']) {
+          <span class="field-error">That posting is too long. Keep it under 60,000 characters.</span>
+        }
+      </label>
+      <p class="hint">
+        The posting is sent to OpenAI to pull out requirements. Anything it tells us to do is ignored, and every
+        requirement must quote the posting.
+      </p>
+      <p class="hint">
+        Your saved job, project, and school lines are then sent to OpenAI to find the ones that show each part. Your
+        name and contact details are not sent, and every quote it returns is checked word for word.
+      </p>
+      @if (formError()) {
+        <p class="form-error" role="alert">{{ formError() }}</p>
+      }
+      <button type="submit" [disabled]="sending()">{{ sending() ? 'Sending…' : 'Read posting' }}</button>
+    </form>
+
+    @if (postings().length > 0) {
+      <div class="section">
+        <h2>Earlier postings</h2>
+        <ul class="list">
+          @for (posting of postings(); track posting.id) {
+            <li class="posting-row">
+              <a class="btn ghost posting-link" [routerLink]="['/jobs', posting.id]">
+                <span>
+                  {{ posting.title || posting.company }}
+                  @if (posting.company) {
+                    <span class="company">{{ posting.company }}</span>
+                  }
+                </span>
+                @if (posting.status !== 'ready') {
+                  <span class="tag" [class.warn]="posting.status === 'failed'">
+                    {{ posting.status === 'matching' ? 'checking' : posting.status }}
+                  </span>
+                }
+              </a>
+              @if (confirming() === posting.id) {
+                <button type="button" class="btn danger small" [disabled]="deleting()" (click)="remove(posting.id)">
+                  Delete this match
+                </button>
+                <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
+              } @else {
+                <button type="button" class="btn ghost small" (click)="confirming.set(posting.id)">Delete</button>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</section>

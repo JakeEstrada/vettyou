@@ -1,0 +1,23 @@
+<section class="page" aria-labelledby="report-heading">
+  <p class="back no-print"><a [routerLink]="['/jobs', id()]">← Back to the match</a></p>
+  <h1 id="report-heading">Report to share</h1>
+  <p class="lede no-print">
+    Everything behind the score: each requirement, its points, the lines used as evidence, and the formula. Send it to
+    anyone who should check the math.
+  </p>
+
+  @if (error()) {
+    <p class="form-error center" role="alert">{{ error() }}</p>
+  } @else if (text() === null) {
+    <p class="lede" role="status">Building the report…</p>
+  } @else {
+    <div class="actions no-print">
+      <button type="button" class="btn" (click)="copy()">Copy text</button>
+      <a class="btn ghost" [href]="pdfUrl(id())" download="vettyou-job-match-report.pdf">Download PDF</a>
+      <a class="btn ghost" [href]="pdfUrl(id())" target="_blank" rel="noopener">Open PDF</a>
+      <a class="btn ghost" [href]="txtUrl(id())" download="vettyou-job-match-report.txt">Download text file</a>
+    </div>
+    <p class="hint center no-print" role="status">{{ copied() }}</p>
+    <pre #report class="report" tabindex="0" aria-label="Report text">{{ text() }}</pre>
+  }
+</section>

@@ -1,0 +1,67 @@
+<section class="page" aria-labelledby="education-heading">
+  <h1 id="education-heading">Education</h1>
+  <p class="lede">Schools, programs and bootcamps. Only what you actually finished or are in.</p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to add education.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else {
+    @if (schools().length > 0) {
+      <ul class="list">
+        @for (school of schools(); track school.id) {
+          <li>
+            <a class="btn ghost school" [routerLink]="['/education', school.id]">
+              <span>
+                {{ school.institution }}
+                @if (degree(school)) {
+                  <span class="degree">{{ degree(school) }}</span>
+                }
+              </span>
+              @if (when(school)) {
+                <span class="when">{{ when(school) }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    } @else if (!adding()) {
+      <p class="lede">Nothing here yet. <a routerLink="/resume">Upload a resume</a> or add a school by hand.</p>
+    }
+    @if (!adding()) {
+      <p class="lede"><button type="button" class="btn" (click)="add()">Add education</button></p>
+    } @else {
+      <form class="form wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label>
+          School
+          <input type="text" formControlName="institution" />
+          @if (form.controls.institution.touched && form.controls.institution.errors?.['required']) {
+            <span class="field-error">School is required.</span>
+          }
+        </label>
+        <label>
+          Degree or certificate
+          <input type="text" formControlName="credential" />
+        </label>
+        <label>
+          Field of study
+          <input type="text" formControlName="fieldOfStudy" />
+        </label>
+        <label>
+          Started
+          <input type="date" formControlName="startDate" />
+        </label>
+        <label>
+          Finished
+          <input type="date" formControlName="endDate" />
+          @if (form.controls.endDate.errors?.['server']) {
+            <span class="field-error">{{ form.controls.endDate.errors?.['server'] }}</span>
+          }
+        </label>
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        <button type="submit">Save education</button>
+      </form>
+    }
+  }
+</section>

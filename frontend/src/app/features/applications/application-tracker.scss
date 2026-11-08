@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+.tracker h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.hint {
+  margin: 0 0 0.8rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  max-width: 46rem;
+}
+
+.import {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.45rem;
+  max-width: 46rem;
+}
+
+.import span {
+  font-weight: 600;
+}
+
+.import input[type='file'] {
+  color: var(--color-muted);
+  font: inherit;
+}
+
+.ledger-wrap {
+  overflow: auto;
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.ledger th,
+.ledger td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.ledger thead th {
+  color: var(--color-muted);
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ledger tbody th {
+  font-weight: 600;
+}
+
+.ledger tbody th,
+.ledger tbody td {
+  white-space: nowrap;
+}
+
+.ledger tbody th {
+  white-space: normal;
+  min-width: 16rem;
+  max-width: 28rem;
+}
+
+.ledger tbody td {
+  white-space: normal;
+}
+
+.meta {
+  color: var(--color-muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.open {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--color-copper);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.open[aria-expanded='true'] {
+  color: var(--color-ink);
+}
+
+a.score {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline;
+}
+
+.detail td {
+  padding-top: 0;
+  white-space: normal;
+}
+
+.posting {
+  max-width: 40rem;
+  padding: 0.25rem 0 0.6rem;
+}
+
+.posting h3 {
+  margin: 0.9rem 0 0.3rem;
+  font-size: 1rem;
+  font-weight: 560;
+}
+
+.posting h3:first-child {
+  margin-top: 0;
+}
+
+.posting p,
+.posting ul {
+  margin: 0 0 0.55rem;
+}
+
+.posting ul {
+  padding-left: 1.2rem;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.actions button {
+  margin-right: 0.35rem;
+}
+
+.btn.small {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.55rem;
+}

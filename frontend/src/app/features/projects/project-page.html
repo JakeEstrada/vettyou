@@ -1,0 +1,243 @@
+<section class="page" aria-labelledby="project-heading">
+  <p class="back"><a routerLink="/projects">← All projects</a></p>
+  @if (loadError()) {
+    <h1 id="project-heading">Project</h1>
+    <p class="form-error" role="alert">{{ loadError() }}</p>
+  } @else if (project(); as project) {
+    <h1 id="project-heading">{{ project.name }}</h1>
+    @if (project.summary) {
+      <p class="lede summary">{{ project.summary }}</p>
+    } @else {
+      <p class="lede">Drop in the README and we will pull out the stack and what you built.</p>
+    }
+
+    @if (project.sources.length > 0) {
+      <p class="hint center">
+        Everything below is copied from your README. Nothing is added. "Not mine" stays off your resume, even if a later
+        README says it again.
+      </p>
+    }
+    @if (claimError()) {
+      <p class="form-error" role="alert">{{ claimError() }}</p>
+    }
+
+    @if (bullets().length > 0) {
+      <section class="section" aria-labelledby="built-heading">
+        <h2 id="built-heading">Bullet points <span class="count">{{ bullets().length }}</span></h2>
+        <p class="hint">
+          Every bullet in the README, under its own heading. Keep them all here; tailoring a resume picks the few that
+          fit a job.
+        </p>
+        @if (bulletsToCheck().length > 0) {
+          <div class="bulk">
+            <span class="hint">{{ bulletsToCheck().length }} not checked yet</span>
+            <button type="button" class="btn ghost small" (click)="keepAll(bulletsToCheck())">
+              Keep all {{ bulletsToCheck().length }} <span class="sr-only">bullet points</span>
+            </button>
+          </div>
+        }
+        @for (group of bulletSections(); track $index) {
+          <h3>{{ group.section }}</h3>
+          <ul class="bullets">
+            @for (claim of group.items; track claim.id) {
+              <li [class]="claim.status">
+                <span class="text">
+                  {{ claim.name }}
+                  @if (claim.planned) {
+                    <span class="tag warn">planned</span>
+                  }
+                </span>
+                <span class="row-actions">
+                  @switch (claim.status) {
+                    @case ('candidate') {
+                      <button type="button" class="link" (click)="decide(claim, 'approved')">
+                        Keep <span class="sr-only">{{ claim.name }}</span>
+                      </button>
+                      <button type="button" class="link muted" (click)="decide(claim, 'rejected')">
+                        Not mine <span class="sr-only">{{ claim.name }}</span>
+                      </button>
+                    }
+                    @case ('approved') {
+                      <span class="state" aria-hidden="true">✓</span>
+                      <button type="button" class="link muted" (click)="decide(claim, 'rejected')">
+                        Not mine <span class="sr-only">{{ claim.name }}</span>
+                      </button>
+                    }
+                    @case ('rejected') {
+                      <button type="button" class="link" (click)="decide(claim, 'approved')">
+                        Keep <span class="sr-only">{{ claim.name }}</span>
+                      </button>
+                    }
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+
+    @if (stack(); as stack) {
+      @if (stack.total > 0) {
+        <section class="section" aria-labelledby="stack-heading">
+          <h2 id="stack-heading">Stack <span class="count">{{ stack.total }}</span></h2>
+          <p class="hint">Tech the README mentions, with the line it came from. Keep what you actually used.</p>
+          @if (stack.review.length > 0) {
+            <div class="bulk">
+              <span class="hint">{{ stack.review.length }} not checked yet</span>
+              <button type="button" class="btn ghost small" (click)="keepAll(stack.review)">
+                Keep all {{ stack.review.length }} <span class="sr-only">stack items</span>
+              </button>
+            </div>
+          }
+          <ul class="claims">
+            @for (claim of stack.review; track claim.id) {
+              <li class="claim">
+                <div class="claim-head">
+                  <strong>{{ claim.name }}</strong>
+                  <span class="tag">{{ claim.category }}</span>
+                  @if (claim.planned) {
+                    <span class="tag warn">planned, not built yet?</span>
+                  }
+                </div>
+                <blockquote>“{{ claim.quote }}”</blockquote>
+                <p class="where">Line {{ claim.lineNumber }}, README version {{ versionOf(claim) }}</p>
+                <div class="actions">
+                  <button type="button" class="btn small" (click)="decide(claim, 'approved')">
+                    Keep <span class="sr-only">{{ claim.name }}</span>
+                  </button>
+                  <button type="button" class="btn ghost small" (click)="decide(claim, 'rejected')">
+                    Not mine <span class="sr-only">{{ claim.name }}</span>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+          @if (stack.kept.length > 0) {
+            <h3>Kept</h3>
+            <ul class="chips">
+              @for (claim of stack.kept; track claim.id) {
+                <li>
+                  {{ claim.name }}
+                  <button type="button" class="link" (click)="decide(claim, 'rejected')">
+                    Undo <span class="sr-only">keeping {{ claim.name }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+          @if (stack.notMine.length > 0) {
+            <h3>Not mine</h3>
+            <ul class="chips muted">
+              @for (claim of stack.notMine; track claim.id) {
+                <li>
+                  {{ claim.name }}
+                  <button type="button" class="link" (click)="decide(claim, 'approved')">
+                    Keep instead <span class="sr-only">{{ claim.name }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    }
+
+    @if (project.sources.length > 0 && project.claims.length === 0) {
+      <section class="section">
+        <p class="hint">We did not find any tech names or bullet lists in that README.</p>
+      </section>
+    }
+
+    <section class="section" aria-labelledby="readme-heading">
+      <h2 id="readme-heading">{{ project.sources.length === 0 ? 'Add the README' : 'Add a newer README' }}</h2>
+      <p class="hint">We only read it for tech names and bullet points. Anything it tells us to do is ignored.</p>
+      <app-readme-drop [busy]="uploading()" (picked)="dropped($event)" />
+      @if (readmeError()) {
+        <p class="form-error" role="alert">{{ readmeError() }}</p>
+      }
+      @if (!pasting()) {
+        <p class="hint center">
+          <button type="button" class="link" (click)="pasting.set(true)">Paste the text instead</button>
+        </p>
+      } @else {
+        <form class="form wide" [formGroup]="readme" (ngSubmit)="uploadReadme()" novalidate>
+          <label>
+            README text
+            <textarea formControlName="body" class="readme"></textarea>
+            @if (readme.controls.body.touched && readme.controls.body.errors?.['required']) {
+              <span class="field-error">Paste the README.</span>
+            }
+          </label>
+          <button type="submit" [disabled]="uploading()">{{ uploading() ? 'Reading…' : 'Read README' }}</button>
+        </form>
+      }
+    </section>
+
+    @if (project.sources.length > 0) {
+      <section class="section" aria-labelledby="versions-heading">
+        <h2 id="versions-heading">README versions</h2>
+        @for (source of project.sources; track source.id) {
+          <details>
+            <summary>Version {{ source.versionNumber }}: {{ source.fileName }}</summary>
+            <pre>{{ source.body }}</pre>
+          </details>
+        }
+        <p class="hint">
+          Missing bullets from an older read?
+          <button type="button" class="link" [disabled]="rereading()" (click)="reread()">
+            {{ rereading() ? 'Reading…' : 'Re-read the latest README' }}
+          </button>
+        </p>
+      </section>
+    }
+
+    <section class="section" aria-labelledby="details-heading">
+      <h2 id="details-heading">Project details</h2>
+      <form class="form wide" [formGroup]="details" (ngSubmit)="saveDetails()" novalidate>
+        <p class="hint">The name comes from the README's title. Drop a newer README to change it.</p>
+        <label>
+          What it does, in your words
+          <textarea formControlName="summary"></textarea>
+        </label>
+        <label>
+          Repo link
+          <input type="text" formControlName="repoUrl" />
+        </label>
+        <label>
+          Live link
+          <input type="text" formControlName="liveUrl" />
+        </label>
+        @if (detailsError()) {
+          <p class="form-error" role="alert">{{ detailsError() }}</p>
+        }
+        @if (detailsSaved()) {
+          <p class="hint" role="status">Saved.</p>
+        }
+        <button type="submit">Save details</button>
+      </form>
+    </section>
+
+    <section class="section danger" aria-labelledby="delete-heading">
+      <h2 id="delete-heading">Delete this project</h2>
+      @if (deleteError()) {
+        <p class="form-error" role="alert">{{ deleteError() }}</p>
+      }
+      @if (!confirming()) {
+        <button type="button" class="btn ghost" (click)="confirming.set(true)">Delete project</button>
+      } @else {
+        <p class="hint" role="alert">
+          This removes the project, every README version, and every bullet and stack decision. It cannot be undone.
+        </p>
+        <div class="row">
+          <button type="button" class="btn danger" [disabled]="deleting()" (click)="remove()">
+            {{ deleting() ? 'Deleting…' : 'Yes, delete it' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="confirming.set(false)">Keep it</button>
+        </div>
+      }
+    </section>
+  } @else {
+    <p class="lede" role="status">Loading project…</p>
+  }
+</section>

@@ -1,0 +1,234 @@
+.back {
+  margin: 0 0 var(--space-2);
+  font-size: 0.9rem;
+}
+
+.summary {
+  white-space: pre-wrap;
+}
+
+.hint {
+  margin: 0 0 var(--space-2);
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.hint.center {
+  text-align: center;
+}
+
+.section .form {
+  margin-top: var(--space-2);
+}
+
+.count {
+  margin-left: 0.35rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.bulk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: var(--space-1);
+}
+
+.bulk .hint {
+  margin: 0;
+}
+
+.bullets {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bullets li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-bottom: 1px solid var(--color-line);
+  position: relative;
+}
+
+.bullets li::before {
+  content: "•";
+  position: absolute;
+  left: 0.15rem;
+  color: var(--color-muted);
+}
+
+.bullets li.approved::before {
+  color: var(--color-copper);
+}
+
+.bullets li.rejected .text {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+.bullets .text {
+  overflow-wrap: anywhere;
+}
+
+.row-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.row-actions .link {
+  padding: 0;
+}
+
+.link.muted {
+  color: var(--color-muted);
+}
+
+.state {
+  color: var(--color-copper);
+  font-size: 0.85rem;
+}
+
+.kept-list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.kept-list.muted li {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+.kept-list.muted .link {
+  text-decoration: underline;
+}
+
+textarea.readme {
+  min-height: 10rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.claims {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.claim {
+  padding: var(--space-2);
+  border: 1px solid var(--color-line);
+}
+
+.claim-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+blockquote {
+  margin: 0.6rem 0 0.25rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-copper);
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.where {
+  margin: 0 0 0.6rem;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+h3 {
+  margin: var(--space-3) 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 560;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-line);
+  font-size: 0.9rem;
+}
+
+.chips.muted li {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+.chips.muted .link {
+  text-decoration: underline;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0 0 0 0.35rem;
+  color: var(--color-copper);
+  font: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+details {
+  border-top: 1px solid var(--color-line);
+  padding: 0.6rem 0;
+}
+
+summary {
+  cursor: pointer;
+}
+
+pre {
+  max-height: 20rem;
+  overflow: auto;
+  padding: var(--space-1);
+  background: var(--color-field);
+  white-space: pre-wrap;
+  font-size: 0.8rem;
+}
+
+.danger .row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,0 +1,111 @@
+<section class="page" aria-labelledby="skills-heading">
+  <h1 id="skills-heading">Skills</h1>
+  <p class="lede">Every tool and language your projects and jobs show, and exactly where each one came from.</p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to see your skills.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading skills…</p>
+  } @else {
+    @if (error()) {
+      <p class="form-error center" role="alert">{{ error() }}</p>
+    }
+
+    @if (toCheck().length > 0) {
+      <section class="section" aria-labelledby="check-heading">
+        <h2 id="check-heading">Check these <span class="count">{{ toCheck().length }}</span></h2>
+        <p class="hint">
+          Found in your project READMEs and resume project lines. Keep the ones you actually used. Only kept skills
+          count toward a job match.
+        </p>
+        <div class="bulk">
+          <span class="hint">{{ toCheck().length }} not checked yet</span>
+          <button type="button" class="btn ghost small" [disabled]="busy()" (click)="keepAll()">
+            Keep all {{ toCheck().length }} <span class="sr-only">skills</span>
+          </button>
+        </div>
+        <ul class="rows">
+          @for (skill of toCheck(); track skill.name) {
+            <li>
+              <span class="text">
+                <strong>{{ skill.name }}</strong>
+                <span class="where">in {{ projectCount(skill) }} {{ projectCount(skill) === 1 ? 'project' : 'projects' }}</span>
+              </span>
+              <span class="row-actions">
+                <button type="button" class="link" [disabled]="busy()" (click)="decide(skill, 'approved')">
+                  Keep <span class="sr-only">{{ skill.name }}</span>
+                </button>
+                <button type="button" class="link muted" [disabled]="busy()" (click)="decide(skill, 'rejected')">
+                  Not mine <span class="sr-only">{{ skill.name }}</span>
+                </button>
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section class="section" aria-labelledby="kept-heading">
+      <h2 id="kept-heading">Your skills <span class="count">{{ kept().length }}</span></h2>
+      @if (kept().length === 0) {
+        <p class="hint">
+          Nothing kept yet. Keep skills above, or <a routerLink="/projects">add a project</a> or
+          <a routerLink="/resume">upload a resume</a>.
+        </p>
+      } @else {
+        <p class="hint">Open a skill to see the exact lines that back it.</p>
+        @for (group of groups(); track group.category) {
+          <h3>{{ group.label }}</h3>
+          @for (skill of group.items; track skill.name) {
+            <details class="skill">
+              <summary>
+                <span>{{ skill.name }}</span>
+                <span class="places">{{ skill.places }} {{ skill.places === 1 ? 'place' : 'places' }}</span>
+              </summary>
+              <ul class="uses">
+                @for (use of skill.uses; track $index) {
+                  @if (use.status === 'approved' || use.status === 'written') {
+                    <li>
+                      <a [routerLink]="link(use)">{{ use.label }}</a>
+                      <blockquote>“{{ use.quote }}”</blockquote>
+                    </li>
+                  }
+                }
+              </ul>
+              <button type="button" class="link muted" [disabled]="busy()" (click)="decide(skill, 'rejected')">
+                Not mine <span class="sr-only">{{ skill.name }}</span>
+              </button>
+            </details>
+          }
+        }
+      }
+    </section>
+
+    @if (planned().length > 0) {
+      <section class="section" aria-labelledby="planned-heading">
+        <h2 id="planned-heading">Planned, not built yet</h2>
+        <p class="hint">Kept, but the README calls them roadmap items, so they do not count as used.</p>
+        <ul class="chips">
+          @for (skill of planned(); track skill.name) {
+            <li>{{ skill.name }}</li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (notMine().length > 0) {
+      <section class="section" aria-labelledby="notmine-heading">
+        <h2 id="notmine-heading">Not mine</h2>
+        <ul class="chips muted">
+          @for (skill of notMine(); track skill.name) {
+            <li>
+              {{ skill.name }}
+              <button type="button" class="link" [disabled]="busy()" (click)="decide(skill, 'approved')">
+                Keep instead <span class="sr-only">{{ skill.name }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</section>

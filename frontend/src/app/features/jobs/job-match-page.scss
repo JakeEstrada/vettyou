@@ -1,0 +1,181 @@
+@use "../../../styles/detail";
+
+.center {
+  text-align: center;
+}
+
+.score,
+.readiness {
+  max-width: 32rem;
+  margin: var(--space-3) auto 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+}
+
+.score {
+  text-align: center;
+}
+
+.total {
+  margin: 0;
+}
+
+.number {
+  font-size: 3.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--color-copper);
+}
+
+.out-of {
+  margin-left: 0.25rem;
+  color: var(--color-muted);
+}
+
+.label {
+  margin: 0 0 var(--space-1);
+  font-weight: 560;
+}
+
+.if-confirmed {
+  margin: 0 0 0.3rem;
+  font-size: 0.9rem;
+}
+
+.factors {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  text-align: left;
+}
+
+.factors dt {
+  font-size: 0.9rem;
+}
+
+.factors dd {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+}
+
+.factors dd.explain,
+.formula {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.factors .left-out {
+  opacity: 0.7;
+}
+
+.weight {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.bar {
+  flex: 1;
+  height: 0.4rem;
+  background: var(--color-line);
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-copper);
+}
+
+.formula {
+  margin: var(--space-2) 0 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.formula span {
+  color: var(--color-ink);
+}
+
+.readiness {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.readiness h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.checks,
+.chips,
+.requirements {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.checks .done {
+  color: var(--color-ink);
+}
+
+.notice {
+  max-width: 32rem;
+  margin: var(--space-2) auto 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--color-copper);
+  font-size: 0.9rem;
+}
+
+.requirements > li {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chips li {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-line);
+  font-size: 0.9rem;
+}
+
+.importance {
+  margin-left: 0.3rem;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0 0 0 0.25rem;
+  color: var(--color-copper);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: var(--space-2) 0 0;
+}
+
+.share a.btn {
+  text-decoration: none;
+}

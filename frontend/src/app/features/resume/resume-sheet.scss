@@ -1,0 +1,268 @@
+:host {
+  display: block;
+  width: min(100%, 8.5in);
+  margin-inline: auto;
+}
+
+.sheet {
+  --primary: #183e45;
+  --secondary: #35636b;
+  --accent: #b67850;
+  --page: #fff;
+  --soft: #f2f5f4;
+  --ink: #202b30;
+  --muted: #64747a;
+  --rule: #dce5e4;
+  background: var(--page);
+  color: var(--ink);
+  padding: 0.42in 0.5in 0.8in;
+  min-height: 11in;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 9.2pt;
+  line-height: 1.32;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 28%);
+}
+
+.mast {
+  background: var(--primary);
+  border-bottom: 3px solid var(--accent);
+  margin: -0.42in -0.5in 13px;
+  padding: 0.28in 0.5in 0.16in;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.mast header {
+  text-align: center;
+}
+
+.sheet h2,
+.sheet h3,
+.sheet p {
+  margin: 0;
+}
+
+.mast h2 {
+  color: #fff;
+  font-size: 22.5pt;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tagline {
+  margin-top: 5px;
+  color: #e4eeec;
+  font-size: 8.7pt;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.contact {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 8.5pt;
+  font-weight: 500;
+}
+
+.sep {
+  width: 3px;
+  height: 3px;
+  margin: 0 8px;
+  background: var(--accent);
+}
+
+.sheet h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 11px 0 6px;
+  color: var(--primary);
+  font-size: 8pt;
+  font-weight: 650;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.sheet h3::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  background: var(--accent);
+}
+
+.sheet h3::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.job {
+  margin-top: 10px;
+  padding-left: 12px;
+  border-left: 1px solid var(--rule);
+}
+
+.edu .job {
+  border-left-color: transparent;
+  padding-left: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: baseline;
+}
+
+.role {
+  color: var(--ink);
+  font-size: 10.2pt;
+  font-weight: 700;
+}
+
+.dot {
+  color: var(--muted);
+  font-weight: 400;
+  padding: 0 0.2em;
+}
+
+.org {
+  font-weight: 600;
+}
+
+.dates {
+  color: var(--muted);
+  white-space: nowrap;
+  font-size: 8.4pt;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.job-meta {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 8.4pt;
+}
+
+.sheet ul {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sheet li {
+  position: relative;
+  margin: 1.5px 0;
+  padding-left: 11px;
+  font-size: 9.5pt;
+  line-height: 1.38;
+}
+
+.sheet li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.48em;
+  width: 3px;
+  height: 3px;
+  background: var(--accent);
+}
+
+.sheet li button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skills {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  column-gap: 16px;
+  padding: 2px 12px;
+  background: var(--soft);
+  border: 1px solid var(--rule);
+  font-size: 9pt;
+  line-height: 1.34;
+}
+
+.skills dt,
+.skills dd {
+  margin: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.skills dt:last-of-type,
+.skills dd:last-of-type {
+  border-bottom: 0;
+}
+
+.skills dt {
+  color: var(--secondary);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 7.7pt;
+}
+
+.projects {
+  margin-top: 13px;
+}
+
+.projects::before {
+  content: "";
+  display: block;
+  height: 2px;
+  width: 1.35in;
+  margin: 0 0 12px;
+  background: var(--primary);
+}
+
+.hit {
+  background: #f4ebe3;
+}
+
+.on {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+mark {
+  background: #f3d7b8;
+  color: inherit;
+  padding: 0 0.08em;
+}
+
+@media (max-width: 720px) {
+  .sheet {
+    padding: 1.1rem 1rem 1.4rem;
+    min-height: 0;
+    font-size: 0.86rem;
+  }
+
+  .mast {
+    margin: -1.1rem -1rem 13px;
+    padding: 1rem 1rem 0.85rem;
+  }
+
+  .mast h2 {
+    font-size: 1.45rem;
+  }
+
+  .skills {
+    grid-template-columns: 1fr;
+  }
+}

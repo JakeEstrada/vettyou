@@ -1,0 +1,31 @@
+<a class="skip" href="#main">Skip to content</a>
+<div class="frame">
+  <aside>
+    <a class="brand" routerLink="/">
+      <img src="vettyou-logo.png" alt="" width="28" height="26" />
+      <span>Vettyou</span>
+    </a>
+    <nav aria-label="Primary">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      @if (session.account()) {
+        <a routerLink="/resume" routerLinkActive="active">Resume</a>
+        <a routerLink="/applications" routerLinkActive="active">Applications</a>
+        <a routerLink="/mailbox" routerLinkActive="active">Email</a>
+        <a routerLink="/scores" routerLinkActive="active">Scores</a>
+      } @else if (session.ready()) {
+        <a routerLink="/register" routerLinkActive="active">Create account</a>
+        <a routerLink="/login" routerLinkActive="active">Log in</a>
+      }
+    </nav>
+    <div class="rail-foot">
+      @if (session.account(); as account) {
+        <p>{{ account.email }}</p>
+        <a routerLink="/account">Account</a>
+        <button type="button" (click)="signOut()">Sign out</button>
+      }
+    </div>
+  </aside>
+  <main id="main">
+    <router-outlet />
+  </main>
+</div>

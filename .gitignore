@@ -1,0 +1,42 @@
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+# Java / Maven / Gradle
+backend/target/
+backend/build/
+backend/.gradle/
+*.class
+*.log
+
+# Angular / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+frontend/.vercel/
+.vercel/
+npm-debug.log*
+
+# Local data
+infra/data/
+*.pdf.tmp
+
+# Personal files that are not the product
+Jake_Estrada_Resume_Master.pdf
+MyResumes/
+job_postings_history.json
+vettyou.zip
+vettyou2.md
+Vettyou_Project_Blueprint_Angular_SpringBoot.md
+vettyoulogo.jpg
+.cursor/

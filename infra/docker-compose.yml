@@ -1,0 +1,25 @@
+name: vettyou
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: vettyou-postgres
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vettyou}
+      POSTGRES_USER: ${POSTGRES_USER:-vettyou}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - vettyou_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vettyou} -d ${POSTGRES_DB:-vettyou}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  vettyou_pgdata:

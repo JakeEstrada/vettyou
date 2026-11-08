@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.zone {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: var(--space-4) var(--space-2);
+  border: 2px dashed var(--color-line);
+  background: var(--color-field);
+  text-align: center;
+  transition: border-color 120ms, background 120ms;
+}
+
+.zone.over {
+  border-color: var(--color-copper);
+  background: #1b1712;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 560;
+}
+
+.or {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.pick {
+  position: relative;
+  padding: 0.55rem 0.9rem;
+  background: #f3f4f6;
+  color: #121418;
+  cursor: pointer;
+}
+
+.pick input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.pick:focus-within {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 3px;
+}
+
+.form-error {
+  margin-top: 0.5rem;
+  text-align: center;
+}

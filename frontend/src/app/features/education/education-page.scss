@@ -1,0 +1,17 @@
+.school {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.degree {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.when {
+  flex-shrink: 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}

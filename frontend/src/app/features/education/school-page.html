@@ -1,0 +1,71 @@
+<section class="page" aria-labelledby="school-heading">
+  <p class="back"><a routerLink="/education">← All education</a></p>
+  @if (loadError()) {
+    <h1 id="school-heading">School</h1>
+    <p class="form-error" role="alert">{{ loadError() }}</p>
+  } @else if (school(); as school) {
+    <h1 id="school-heading">{{ school.institution }}</h1>
+    <p class="lede">
+      {{ degree() || 'No degree saved' }}
+      @if (when()) {
+        · {{ when() }}
+      }
+    </p>
+
+    <section class="section" aria-labelledby="edit-heading">
+      <h2 id="edit-heading">Edit this school</h2>
+      <form class="form wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label>
+          School
+          <input type="text" formControlName="institution" />
+          @if (form.controls.institution.touched && form.controls.institution.errors?.['required']) {
+            <span class="field-error">School is required.</span>
+          }
+        </label>
+        <label>
+          Degree or certificate
+          <input type="text" formControlName="credential" />
+        </label>
+        <label>
+          Field of study
+          <input type="text" formControlName="fieldOfStudy" />
+        </label>
+        <label>
+          Started
+          <input type="date" formControlName="startDate" />
+        </label>
+        <label>
+          Finished
+          <input type="date" formControlName="endDate" />
+          @if (form.controls.endDate.errors?.['server']) {
+            <span class="field-error">{{ form.controls.endDate.errors?.['server'] }}</span>
+          }
+        </label>
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        @if (saved()) {
+          <p class="hint" role="status">Saved.</p>
+        }
+        <button type="submit">Save school</button>
+      </form>
+    </section>
+
+    <section class="section danger" aria-labelledby="delete-heading">
+      <h2 id="delete-heading">Delete this school</h2>
+      @if (!confirming()) {
+        <button type="button" class="btn ghost" (click)="confirming.set(true)">Delete school</button>
+      } @else {
+        <p class="hint" role="alert">This removes the school from your education. It cannot be undone.</p>
+        <div class="row">
+          <button type="button" class="btn danger" [disabled]="deleting()" (click)="remove()">
+            {{ deleting() ? 'Deleting…' : 'Yes, delete it' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="confirming.set(false)">Keep it</button>
+        </div>
+      }
+    </section>
+  } @else {
+    <p class="lede" role="status">Loading school…</p>
+  }
+</section>

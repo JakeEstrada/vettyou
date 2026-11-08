@@ -1,0 +1,116 @@
+<section class="page" aria-labelledby="job-heading">
+  <p class="back"><a routerLink="/experience">← All jobs</a></p>
+  @if (loadError()) {
+    <h1 id="job-heading">Job</h1>
+    <p class="form-error" role="alert">{{ loadError() }}</p>
+  } @else if (job(); as job) {
+    <h1 id="job-heading">{{ job.title }}</h1>
+    <p class="lede">
+      {{ job.employer }}
+      @if (job.location) {
+        · {{ job.location }}
+      }
+      @if (when()) {
+        · {{ when() }}
+      }
+    </p>
+
+    <section class="section" aria-labelledby="did-heading">
+      <h2 id="did-heading">What you did <span class="count">{{ bullets().length }}</span></h2>
+      @if (bullets().length > 0) {
+        <p class="hint">Every line you wrote for this job. Tailoring a resume picks the few that fit a posting.</p>
+        <ul class="bullets">
+          @for (line of bullets(); track $index) {
+            <li>{{ line }}</li>
+          }
+        </ul>
+      } @else {
+        <p class="hint">Nothing written yet. Add what you did below.</p>
+      }
+    </section>
+
+    <section class="section" aria-labelledby="edit-heading">
+      <h2 id="edit-heading">Edit this job</h2>
+      <form class="form wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label>
+          Employer
+          <input type="text" formControlName="employer" />
+          @if (form.controls.employer.touched && form.controls.employer.errors?.['required']) {
+            <span class="field-error">Employer is required.</span>
+          }
+        </label>
+        <label>
+          Job title
+          <input type="text" formControlName="title" />
+          @if (form.controls.title.touched && form.controls.title.errors?.['required']) {
+            <span class="field-error">Job title is required.</span>
+          }
+        </label>
+        <label>
+          Where
+          <input type="text" formControlName="location" />
+        </label>
+        <label>
+          Started
+          <input type="date" formControlName="startDate" />
+        </label>
+        @if (!form.controls.current.value) {
+          <label>
+            Ended
+            <input type="date" formControlName="endDate" />
+            @if (form.controls.endDate.errors?.['server']) {
+              <span class="field-error">{{ form.controls.endDate.errors?.['server'] }}</span>
+            }
+          </label>
+        }
+        <label class="check">
+          <input type="checkbox" formControlName="current" />
+          I still work here
+        </label>
+        <label>
+          What you did, one line per point
+          <textarea formControlName="body" class="tall"></textarea>
+          @if (form.controls.body.touched && form.controls.body.errors?.['required']) {
+            <span class="field-error">Write what you did.</span>
+          }
+        </label>
+        @if (formError()) {
+          <p class="form-error" role="alert">{{ formError() }}</p>
+        }
+        @if (saved()) {
+          <p class="hint" role="status">Saved. Earlier wording stays in the history below.</p>
+        }
+        <button type="submit">Save job</button>
+      </form>
+    </section>
+
+    @if (job.versions.length > 1) {
+      <section class="section" aria-labelledby="history-heading">
+        <h2 id="history-heading">History</h2>
+        @for (version of job.versions; track version.number) {
+          <details>
+            <summary>{{ version.number === 1 ? 'Original' : 'Revision ' + version.number }}</summary>
+            <pre>{{ version.body }}</pre>
+          </details>
+        }
+      </section>
+    }
+
+    <section class="section danger" aria-labelledby="delete-heading">
+      <h2 id="delete-heading">Delete this job</h2>
+      @if (!confirming()) {
+        <button type="button" class="btn ghost" (click)="confirming.set(true)">Delete job</button>
+      } @else {
+        <p class="hint" role="alert">This removes the job and every saved version of what you wrote. It cannot be undone.</p>
+        <div class="row">
+          <button type="button" class="btn danger" [disabled]="deleting()" (click)="remove()">
+            {{ deleting() ? 'Deleting…' : 'Yes, delete it' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="confirming.set(false)">Keep it</button>
+        </div>
+      }
+    </section>
+  } @else {
+    <p class="lede" role="status">Loading job…</p>
+  }
+</section>

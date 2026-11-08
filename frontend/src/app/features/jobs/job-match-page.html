@@ -1,0 +1,210 @@
+<section class="page" aria-labelledby="match-heading">
+  <p class="back"><a routerLink="/applications">← Applications</a> · <a routerLink="/jobs">All postings</a></p>
+  @if (loadError()) {
+    <h1 id="match-heading">Job posting</h1>
+    <p class="form-error" role="alert">{{ loadError() }}</p>
+  } @else if (posting(); as posting) {
+    <h1 id="match-heading">{{ posting.title || 'Job posting' }}</h1>
+    <p class="lede">
+      @if (posting.company) {
+        {{ posting.company }} ·
+      }
+      @switch (posting.status) {
+        @case ('reading') {
+          Reading the posting…
+        }
+        @case ('matching') {
+          Checking your evidence…
+        }
+        @case ('failed') {
+          Could not finish this posting
+        }
+        @default {
+          @if (posting.reader === 'history' && !posting.matcher) {
+            Saved from your job history. The estimate stays empty until you paste a fuller posting and read it.
+          } @else {
+            Read {{ posting.reader === 'rules' ? 'with the tech list' : 'by ' + posting.reader.replace('openai:', '') }},
+            evidence checked by {{ matcherName(posting) }}
+            @if (posting.matchedAt) {
+              on {{ posting.matchedAt | date: 'MMM d, h:mm a' }}
+            }
+          }
+        }
+      }
+    </p>
+    @if (actionError()) {
+      <p class="form-error center" role="alert">{{ actionError() }}</p>
+    }
+
+    @if (busy()) {
+      <p class="hint center" role="status">This usually takes 20 to 90 seconds. The page updates on its own.</p>
+    } @else if (posting.status === 'failed') {
+      <p class="form-error center" role="alert">{{ posting.error }}</p>
+      <p class="center"><button type="button" class="btn" (click)="reread()">Try again</button></p>
+    } @else {
+      @if (posting.evidenceChanged) {
+        <p class="notice" role="status">
+          Your saved jobs, projects, or education changed after this check.
+          <button type="button" class="link" (click)="rematch()">Check my evidence again</button>
+        </p>
+      }
+
+      <section class="score" aria-labelledby="score-heading">
+        <h2 id="score-heading" class="sr-only">Score</h2>
+        @if (posting.score.total !== null) {
+          <p class="total">
+            <span class="number">{{ posting.score.total }}</span><span class="out-of">/100</span>
+          </p>
+        } @else {
+          <p class="total"><span class="out-of">Nothing can be scored yet</span></p>
+        }
+        <p class="label">{{ posting.score.label }}</p>
+        <p class="hint">{{ posting.score.note }}</p>
+        @if (showIfConfirmed()) {
+          <p class="if-confirmed">
+            {{ posting.score.totalIfConfirmed }}/100 if you confirm {{ posting.score.toConfirm }} flagged project
+            {{ posting.score.toConfirm === 1 ? 'line' : 'lines' }} on your <a routerLink="/projects">project pages</a>.
+          </p>
+        }
+        @if (posting.score.toAnswer > 0) {
+          <p class="if-confirmed">
+            {{ posting.score.toAnswer }} {{ posting.score.toAnswer === 1 ? 'item needs' : 'items need' }} your answer
+            before {{ posting.score.toAnswer === 1 ? 'it counts' : 'they count' }}.
+          </p>
+        }
+        <dl class="factors">
+          @for (factor of posting.score.factors; track factor.key) {
+            <div [class.left-out]="factor.value === null">
+              <dt>
+                {{ factor.label }} <span class="weight">{{ weight(factor) }}</span>
+              </dt>
+              <dd>
+                <span class="bar" aria-hidden="true"><span [style.width.%]="(factor.value ?? 0) * 100"></span></span>
+                {{ percent(factor.value) }} · {{ points(factor) }}
+                @if (factor.valueIfConfirmed !== factor.value && factor.valueIfConfirmed !== null) {
+                  <span class="weight">({{ percent(factor.valueIfConfirmed) }} if confirmed)</span>
+                }
+              </dd>
+              <dd class="explain">{{ factor.how }}</dd>
+            </div>
+          }
+        </dl>
+        <p class="formula"><span>How it adds up:</span> {{ posting.score.formula }}</p>
+        <p class="share">
+          <a class="btn" [routerLink]="['/jobs', posting.id, 'resume']">Tailored resume</a>
+          <a class="btn ghost" [routerLink]="['/jobs', posting.id, 'report']">Report to share (PDF or text)</a>
+        </p>
+      </section>
+
+      <section class="readiness" aria-labelledby="readiness-heading">
+        <h2 id="readiness-heading">Application readiness <span class="weight">not part of the score</span></h2>
+        <ul class="checks">
+          @for (check of posting.score.readiness.checks; track check.label) {
+            <li [class.done]="check.done">{{ check.label }}: {{ check.done ? 'yes' : 'missing' }}</li>
+          }
+        </ul>
+      </section>
+
+      @for (group of groups(); track group.id) {
+        @if (group.items.length > 0) {
+          <section class="section" [attr.aria-labelledby]="group.id + '-heading'">
+            <h2 [id]="group.id + '-heading'">{{ group.title }} <span class="count">{{ group.items.length }}</span></h2>
+            <ul class="requirements">
+              @for (item of group.items; track item.id) {
+                <li>
+                  <app-requirement-item
+                    [item]="item"
+                    [saving]="answering() === item.id"
+                    (answered)="answer(item, $event)"
+                    (removed)="removeRequirement(item)"
+                  />
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      }
+
+      @if (toAnswer().length > 0) {
+        <section class="section" aria-labelledby="answer-heading">
+          <h2 id="answer-heading">Needs your answer</h2>
+          <p class="hint">
+            Saved text can't settle these, for example years, licenses, or eligibility. Open each one above and answer.
+          </p>
+          <ul class="chips">
+            @for (item of toAnswer(); track item.id) {
+              <li>{{ item.skill }}</li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (toConfirm().length > 0) {
+        <section class="section" aria-labelledby="confirm-heading">
+          <h2 id="confirm-heading">Shown only in lines you haven't confirmed</h2>
+          <p class="hint">
+            These rely on project lines that are still candidates. Confirm them on your
+            <a routerLink="/projects">project pages</a> to count them.
+          </p>
+          <ul class="chips">
+            @for (item of toConfirm(); track item.id) {
+              <li>{{ item.skill }}</li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (missingParts().length > 0) {
+        <section class="section" aria-labelledby="missing-heading">
+          <h2 id="missing-heading">Not shown in your saved material</h2>
+          <p class="hint">
+            Nothing you've saved shows these specific parts, so a tailored resume won't claim them. The rest of each
+            item can still be used. If you have done one, add a job or project line that shows it.
+          </p>
+          <ul class="chips muted">
+            @for (part of missingParts(); track part.key) {
+              <li>{{ part.text }} <span class="importance">from {{ part.from }}</span></li>
+            }
+          </ul>
+        </section>
+      }
+
+      <section class="section" aria-labelledby="posting-heading">
+        <h2 id="posting-heading">The posting</h2>
+        <details>
+          <summary>{{ posting.reader === 'history' ? 'Show the saved posting' : 'Show the text you pasted' }}</summary>
+          <pre>{{ posting.body }}</pre>
+        </details>
+        <p class="hint">
+          Added or edited a job or project?
+          <button type="button" class="link" (click)="rematch()">Check my evidence again</button>
+          (keeps your answers)
+        </p>
+        <p class="hint">
+          Wrong or missing requirements?
+          <button type="button" class="link" (click)="reread()">Read the posting again</button>
+          (clears your answers)
+        </p>
+      </section>
+    }
+
+    @if (!busy()) {
+      <section class="section danger" aria-labelledby="delete-heading">
+        <h2 id="delete-heading">Delete this posting</h2>
+        @if (!confirming()) {
+          <button type="button" class="btn ghost" (click)="confirming.set(true)">Delete posting</button>
+        } @else {
+          <p class="hint" role="alert">This removes the posting and its match. Your skills are not touched.</p>
+          <div class="row">
+            <button type="button" class="btn danger" [disabled]="deleting()" (click)="remove()">
+              {{ deleting() ? 'Deleting…' : 'Yes, delete it' }}
+            </button>
+            <button type="button" class="btn ghost" (click)="confirming.set(false)">Keep it</button>
+          </div>
+        }
+      </section>
+    }
+  } @else {
+    <p class="lede" role="status">Loading posting…</p>
+  }
+</section>

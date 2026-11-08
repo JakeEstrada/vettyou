@@ -1,0 +1,44 @@
+@use "../../../styles/detail";
+
+.center {
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: var(--space-3) 0 var(--space-1);
+}
+
+.actions a.btn {
+  text-decoration: none;
+}
+
+.report {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-line);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.report:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 2px;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  .report {
+    border: 0;
+    padding: 0;
+    color: #000;
+  }
+}

@@ -1,0 +1,11 @@
+<section class="page" aria-labelledby="account-heading">
+  <h1 id="account-heading">Account</h1>
+  @if (session.account(); as account) {
+    <p class="lede">Signed in as {{ account.email }}</p>
+  } @else if (session.ready()) {
+    <p class="lede">You are not signed in.</p>
+    <p class="lede"><a routerLink="/login">Log in</a></p>
+  } @else {
+    <p class="lede" role="status">Checking your account…</p>
+  }
+</section>

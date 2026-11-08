@@ -1,0 +1,223 @@
+<section class="page studio" aria-labelledby="resume-heading">
+  <h1 id="resume-heading">Resume</h1>
+  <p class="lede">Master is everything you have saved. Recent is a resume built for one posting. Type on the left; the page follows.</p>
+
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to open your resume.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else {
+    <div class="switch" role="tablist" aria-label="Which resume">
+      <button type="button" role="tab" [attr.aria-selected]="view() === 'recent'" (click)="setView('recent')">Recent</button>
+      <button type="button" role="tab" [attr.aria-selected]="view() === 'master'" (click)="setView('master')">Master</button>
+    </div>
+
+    @if (loadError()) {
+      <p class="form-error" role="alert">{{ loadError() }}</p>
+    }
+
+    <div class="studio-grid">
+      <div class="editor">
+        @if (view() === 'master') {
+          <form [formGroup]="contact" (ngSubmit)="save()">
+            <label>
+              Name
+              <input formControlName="displayName" autocomplete="name" />
+            </label>
+            <label>
+              Email
+              <input formControlName="email" type="email" autocomplete="email" />
+            </label>
+            <label>
+              Phone
+              <input formControlName="phone" autocomplete="tel" />
+            </label>
+            <label>
+              Location
+              <input formControlName="location" autocomplete="address-level2" />
+            </label>
+            <label>
+              Website
+              <input formControlName="website" />
+            </label>
+            <label>
+              LinkedIn
+              <input formControlName="linkedin" />
+            </label>
+
+            <h2>Experience</h2>
+            @if (jobs().length === 0) {
+              <p class="hint">No jobs yet. Upload a resume below, or add one on the experience page.</p>
+            }
+            @for (job of jobs(); track job.id) {
+              <label>
+                {{ job.title }} at {{ job.employer }}
+                <textarea [formControl]="bodyControl(job.id)" rows="6"></textarea>
+              </label>
+            }
+
+            <h2>Projects</h2>
+            <p class="hint">These are bullets you kept. Change them on the project page. They are not reworded here.</p>
+            @if (projectBlocks().length === 0) {
+              <p class="hint">No projects yet.</p>
+            }
+            @for (project of projectBlocks(); track project.id) {
+              <p><a [routerLink]="['/projects', project.id]">{{ project.name }}</a></p>
+              @if (project.bullets.length === 0) {
+                <p class="hint">No kept bullets.</p>
+              } @else {
+                <ul>
+                  @for (bullet of project.bullets; track $index) {
+                    <li>{{ bullet }}</li>
+                  }
+                </ul>
+              }
+            }
+
+            <h2>Education</h2>
+            @if (schools().length === 0) {
+              <p class="hint">No schools yet.</p>
+            }
+            <ul>
+              @for (school of schools(); track school.id) {
+                <li>
+                  <a [routerLink]="['/education', school.id]">{{ school.institution }}</a>
+                </li>
+              }
+            </ul>
+
+            <p class="sources">
+              <a routerLink="/profile">Profile</a>
+              <a routerLink="/experience">Experience</a>
+              <a routerLink="/projects">Projects</a>
+              <a routerLink="/education">Education</a>
+              <a routerLink="/skills">Skills</a>
+            </p>
+
+            @if (dirty()) {
+              <p role="status">Unsaved changes. The page on the right is already showing them.</p>
+            }
+            @if (saveError()) {
+              <p class="form-error" role="alert">{{ saveError() }}</p>
+            }
+            @if (savedNote()) {
+              <p role="status">{{ savedNote() }}</p>
+            }
+            <button type="submit" [disabled]="!dirty() || saving()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+          </form>
+        } @else if (recents().length === 0) {
+          <p>No tailored resume yet. <a routerLink="/jobs">Match a posting</a>, then build one.</p>
+        } @else {
+          <p class="hint">This saved version does not change. What you type here only changes the preview.</p>
+          <ul class="recent-list">
+            @for (item of recents(); track item.resumeId) {
+              <li>
+                <button
+                  type="button"
+                  [attr.aria-current]="opened()?.id === item.resumeId ? 'true' : null"
+                  (click)="openRecent(item)"
+                >
+                  {{ item.title }}
+                  @if (item.company) {
+                    <span>at {{ item.company }}</span>
+                  }
+                  <span>version {{ item.version }}</span>
+                  @if (item.total !== null) {
+                    <span>Vettyou estimate {{ item.total }}</span>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+          @if (opening()) {
+            <p role="status">Opening…</p>
+          }
+          @if (opened(); as resume) {
+            <p>
+              <a [routerLink]="['/jobs', resume.postingId, 'resume']">Open the saved page</a>
+            </p>
+            <h2>Experience</h2>
+            @for (job of shown().jobs; track $index; let jobIndex = $index) {
+              <h3>{{ job.title }}</h3>
+              @for (bullet of job.bullets; track $index; let bulletIndex = $index) {
+                <label>
+                  Line {{ bulletIndex + 1 }}
+                  <textarea [formControl]="recentControl('job-' + jobIndex + '-' + bulletIndex)" rows="3"></textarea>
+                </label>
+              }
+            }
+            @if (shown().projects.length > 0) {
+              <h2>Projects</h2>
+              @for (project of shown().projects; track $index; let projectIndex = $index) {
+                <h3>{{ project.title }}</h3>
+                @for (bullet of project.bullets; track $index; let bulletIndex = $index) {
+                  <label>
+                    Line {{ bulletIndex + 1 }}
+                    <textarea
+                      [formControl]="recentControl('project-' + projectIndex + '-' + bulletIndex)"
+                      rows="3"
+                    ></textarea>
+                  </label>
+                }
+              }
+            }
+          }
+        }
+      </div>
+
+      <div class="preview">
+        <app-resume-sheet [model]="shown()" />
+      </div>
+    </div>
+
+    @if (view() === 'master') {
+      <details class="upload">
+        <summary>Upload a resume</summary>
+        <p class="hint">
+          We copy the name, phone, location, and links into your profile, then split jobs, projects, and schools onto
+          their own pages. Nothing is added that the file did not say.
+        </p>
+        <app-resume-drop label="Drop a resume here" [busy]="importing()" (picked)="importResume($event)" />
+        @if (!pasting()) {
+          <p>
+            <button type="button" class="link" (click)="pasting.set(true)">Paste the text instead</button>
+          </p>
+        } @else {
+          <form (ngSubmit)="pasteResume()">
+            <label>
+              Resume text
+              <textarea [formControl]="paste" rows="8"></textarea>
+              @if (paste.touched && paste.errors?.['required']) {
+                <span class="field-error">Paste the resume.</span>
+              }
+            </label>
+            <button type="submit" [disabled]="importing()">{{ importing() ? 'Reading…' : 'Read resume' }}</button>
+          </form>
+        }
+        @if (importError()) {
+          <p class="form-error" role="alert">{{ importError() }}</p>
+        }
+        @if (result(); as imported) {
+          <h2>Saved from this resume</h2>
+          @if (imported.profile.displayName) {
+            <p>{{ imported.profile.displayName }}</p>
+          }
+          @if (imported.jobs.length > 0) {
+            <ul>
+              @for (job of imported.jobs; track job.id) {
+                <li>{{ job.label }}</li>
+              }
+            </ul>
+          }
+          @if (imported.skipped.length > 0) {
+            <ul>
+              @for (note of imported.skipped; track note) {
+                <li>{{ note }}</li>
+              }
+            </ul>
+          }
+        }
+      </details>
+    }
+  }
+</section>

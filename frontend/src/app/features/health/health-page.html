@@ -1,0 +1,10 @@
+<section class="page" aria-labelledby="health-heading">
+  <h1 id="health-heading">Server status</h1>
+  @if (state().kind === 'loading') {
+    <p class="lede" role="status">Checking the server…</p>
+  } @else if (state().kind === 'error') {
+    <p class="form-error" role="alert">The server did not answer. Start the backend, then refresh this page.</p>
+  } @else {
+    <p class="lede" role="status">Status: <strong>{{ statusText() }}</strong></p>
+  }
+</section>

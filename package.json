@@ -1,7 +1,0 @@
-{
-  "name": "vettyou",
-  "private": true,
-  "scripts": {
-    "build": "node -e \"require('fs').accessSync('public/index.html'); console.log('OK public/');\""
-  }
-}

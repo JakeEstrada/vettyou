@@ -1,0 +1,23 @@
+<div
+  class="zone"
+  [class.over]="over()"
+  [class.busy]="busy()"
+  (dragenter)="dragOver($event)"
+  (dragover)="dragOver($event)"
+  (dragleave)="dragLeave($event)"
+  (drop)="drop($event)"
+>
+  @if (busy()) {
+    <p class="title" role="status">Reading the README…</p>
+  } @else {
+    <p class="title">{{ label() }}</p>
+    <p class="or">or</p>
+    <label class="pick">
+      Choose a file
+      <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" (change)="choose($event)" />
+    </label>
+  }
+</div>
+@if (error()) {
+  <p class="form-error" role="alert">{{ error() }}</p>
+}

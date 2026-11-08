@@ -1,0 +1,110 @@
+<section class="page scores" aria-labelledby="scores-heading">
+  <h1 id="scores-heading">Scores</h1>
+  <p class="lede">
+    A Vettyou estimate of the latest resume for each posting. It is our reading, not an employer's applicant tracking
+    score.
+  </p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to see scores.</p>
+  } @else if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else {
+    <p class="lede"><a routerLink="/jobs">Match a new posting</a></p>
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+    @if (rows().length === 0) {
+      <p class="lede">No matches yet.</p>
+    } @else {
+      <ul class="activity">
+        @for (row of rows(); track row.postingId) {
+          <li>
+            <button type="button" class="open" [attr.aria-current]="opened()?.id === row.resumeId ? 'true' : null" (click)="open(row)">
+              <span class="title">
+                {{ row.title }}
+                @if (row.company) {
+                  <span class="company">{{ row.company }}</span>
+                }
+              </span>
+              <span class="meta">
+                @if (row.total !== null) {
+                  Vettyou estimate {{ row.total }}/100
+                } @else {
+                  No resume yet
+                }
+                @if (row.version !== null) {
+                  · version {{ row.version }}
+                }
+              </span>
+            </button>
+            @if (confirming() === row.postingId) {
+              <button type="button" class="btn danger small" [disabled]="deleting()" (click)="remove(row.postingId)">
+                Delete this match
+              </button>
+              <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
+            } @else {
+              <button type="button" class="btn ghost small" (click)="confirming.set(row.postingId)">Delete</button>
+            }
+          </li>
+        }
+      </ul>
+    }
+
+    @if (opening()) {
+      <p role="status">Opening…</p>
+    }
+    @if (opened(); as resume) {
+      <div class="detail">
+        <div>
+          <p class="estimate">
+            <strong>{{ resume.score.total ?? '—' }}</strong>
+            <span>/100</span>
+          </p>
+          <p class="hint">{{ resume.score.note || 'Vettyou estimate. Not an employer\'s applicant tracking score.' }}</p>
+          @if (resume.stale) {
+            <p class="hint">This version no longer matches your data. It stays as it was built.</p>
+          }
+          <h2>What to improve</h2>
+          @if (resume.suggestions.length === 0 && resume.workOn.length === 0) {
+            <p class="hint">Nothing else to change on this version.</p>
+          }
+          <ul>
+            @for (item of resume.suggestions; track item.text) {
+              <li>{{ item.text }}</li>
+            }
+            @for (item of resume.workOn.slice(0, 6); track item.requirement + item.part) {
+              <li>
+                {{ item.requirement }}
+                @if (item.part) {
+                  — {{ item.part }}
+                }
+                . {{ item.reason }}
+              </li>
+            }
+            @for (check of resume.checks; track check.key) {
+              @if (!check.passed && check.detail) {
+                <li>{{ check.detail }}</li>
+              }
+            }
+          </ul>
+          <p>
+            <a [routerLink]="['/jobs', resume.postingId, 'resume']">Open the full resume</a>
+          </p>
+        </div>
+        @if (sheet(); as page) {
+          <div>
+            <app-resume-sheet [model]="page" [highlights]="highlights()" [picked]="picked()" (pick)="choose($event)" />
+            <p class="why">
+              @if (why()) {
+                <strong>Why this line.</strong> {{ why() }}
+              } @else {
+                Marked lines are the ones that count toward the estimate. Select one to see which part of the posting
+                it shows.
+              }
+            </p>
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

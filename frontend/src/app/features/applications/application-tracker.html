@@ -1,0 +1,143 @@
+<section class="tracker" aria-labelledby="apps-heading">
+  <h2 id="apps-heading">Applications</h2>
+  <p class="hint">
+    Newest first. Company, salary, and the posting come from what you pasted or imported. Click the job for the
+    description. The score opens the full match. Status comes from confirmed mail on Email. The number is a Vettyou
+    estimate, not an employer ATS score. Importing does not change your profile.
+  </p>
+  <label class="import">
+    <span>Import job history</span>
+    <input
+      type="file"
+      accept="application/json,.json"
+      [disabled]="importing()"
+      (change)="importFile($event)"
+    />
+  </label>
+  <p class="hint">
+    Copies the title, company, salary range, and saved posting text. Email can then match by company when you confirm a
+    message. Unknown employers and unknown salaries stay blank.
+  </p>
+  @if (importing()) {
+    <p class="hint" role="status">Importing…</p>
+  }
+  @if (importNote()) {
+    <p class="hint" role="status">{{ importNote() }}</p>
+  }
+  @if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  }
+  @if (rows().length === 0) {
+    <p class="hint">None yet. Import a history file or <a routerLink="/jobs">paste a job</a>.</p>
+  } @else {
+    <div class="ledger-wrap">
+      <table class="ledger">
+        <caption class="sr-only">Applications, most recent first</caption>
+        <thead>
+          <tr>
+            <th scope="col">Job</th>
+            <th scope="col">Company</th>
+            <th scope="col">Salary</th>
+            <th scope="col">Score</th>
+            <th scope="col">Date</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.key) {
+            <tr>
+              <th scope="row">
+                @if (row.postingId) {
+                  <button
+                    type="button"
+                    class="open"
+                    [attr.aria-expanded]="opened() === row.key"
+                    (click)="openPosting(row)"
+                  >
+                    {{ row.title }}
+                  </button>
+                } @else {
+                  {{ row.title }}
+                }
+              </th>
+              <td>{{ row.company || '—' }}</td>
+              <td>{{ row.pay || '—' }}</td>
+              <td>
+                @if (row.postingId) {
+                  <a class="score" [routerLink]="['/jobs', row.postingId]">
+                    @if (scoreOf(row) !== null) {
+                      {{ scoreOf(row) }}/100
+                    } @else {
+                      Open match
+                    }
+                  </a>
+                } @else if (scoreOf(row) !== null) {
+                  {{ scoreOf(row) }}/100
+                } @else {
+                  —
+                }
+              </td>
+              <td>{{ when(row.date) }}</td>
+              <td>
+                @if (row.application) {
+                  <span>{{ statusOf(row.application) }}</span>
+                } @else {
+                  <span class="meta">Not tracked</span>
+                }
+              </td>
+              <td class="actions">
+                @if (row.application; as item) {
+                  @if (confirming() === item.id) {
+                    <button type="button" class="btn danger small" (click)="remove(item.id)">Delete</button>
+                    <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
+                  } @else {
+                    <button type="button" class="btn ghost small" (click)="confirming.set(item.id)">Delete</button>
+                  }
+                } @else if (row.postingId) {
+                  <button
+                    type="button"
+                    class="btn small"
+                    [disabled]="tracking() === row.postingId"
+                    (click)="track({ postingId: row.postingId, title: row.title, company: row.company, pay: row.pay, preview: row.preview, createdAt: row.date, total: row.estimate })"
+                  >
+                    {{ tracking() === row.postingId ? 'Saving…' : 'Track' }}
+                  </button>
+                }
+              </td>
+            </tr>
+            @if (opened() === row.key) {
+              <tr class="detail">
+                <td colspan="7">
+                  @if (looking() === row.postingId) {
+                    <p class="meta" role="status">Loading…</p>
+                  } @else if (detail(row.postingId); as posting) {
+                    <div class="posting">
+                      @for (block of blocks(posting.body); track $index) {
+                        @switch (block.kind) {
+                          @case ('heading') {
+                            <h3>{{ block.text }}</h3>
+                          }
+                          @case ('list') {
+                            <ul>
+                              @for (item of block.items; track item) {
+                                <li>{{ item }}</li>
+                              }
+                            </ul>
+                          }
+                          @default {
+                            <p>{{ block.text }}</p>
+                          }
+                        }
+                      }
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

@@ -1,0 +1,55 @@
+<section class="page" aria-labelledby="profile-heading">
+  <h1 id="profile-heading">Profile</h1>
+  <p class="lede">This is what goes at the top of the resume.</p>
+  @if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to save your profile.</p>
+  } @else {
+    <form class="form wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label>
+        Name
+        <input type="text" formControlName="displayName" autocomplete="name" />
+        @if (form.controls.displayName.touched && form.controls.displayName.errors?.['required']) {
+          <span class="field-error">Name is required.</span>
+        } @else if (form.controls.displayName.errors?.['server']) {
+          <span class="field-error">{{ form.controls.displayName.errors?.['server'] }}</span>
+        }
+      </label>
+      <label>
+        Email
+        <input type="email" formControlName="email" autocomplete="email" aria-describedby="email-hint" />
+        <span class="hint" id="email-hint" aria-hidden="true">
+          The address employers should reply to. It can differ from your login.
+        </span>
+        @if (form.controls.email.touched && form.controls.email.errors?.['email']) {
+          <span class="field-error">Enter an email address like name&#64;example.com.</span>
+        } @else if (form.controls.email.errors?.['server']) {
+          <span class="field-error">{{ form.controls.email.errors?.['server'] }}</span>
+        }
+      </label>
+      <label>
+        Phone
+        <input type="tel" formControlName="phone" autocomplete="tel" />
+      </label>
+      <label>
+        Location
+        <input type="text" formControlName="location" autocomplete="address-level2" />
+      </label>
+      <label>
+        Website
+        <input type="text" formControlName="website" autocomplete="url" />
+      </label>
+      <label>
+        LinkedIn
+        <input type="text" formControlName="linkedin" />
+      </label>
+      @if (formError()) {
+        <p class="form-error" role="alert">{{ formError() }}</p>
+      }
+      @if (saved()) {
+        <p class="lede" role="status">Saved.</p>
+      }
+      <button type="submit">Save profile</button>
+    </form>
+    <p class="lede"><a routerLink="/experience">Write a job next</a></p>
+  }
+</section>

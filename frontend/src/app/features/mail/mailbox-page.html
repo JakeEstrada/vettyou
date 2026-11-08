@@ -1,0 +1,16 @@
+<section class="page wide" aria-labelledby="email-heading">
+  <h1 id="email-heading">Email</h1>
+  <p class="lede">
+    Connect the mailbox you apply from. Messages are classified, then you confirm. Click a line to open the email.
+  </p>
+  @if (loading()) {
+    <p class="lede" role="status">Loading…</p>
+  } @else if (missing()) {
+    <p class="lede"><a routerLink="/login">Log in</a> to connect email and track applications.</p>
+  } @else if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <app-mailbox-connect (recorded)="reload()" />
+    <app-application-tracker [items]="items()" [openings]="openings()" />
+  }
+</section>

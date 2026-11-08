@@ -1,0 +1,33 @@
+.form textarea.posting {
+  min-height: 18rem;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.posting-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.company {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.posting-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.posting-row .posting-link {
+  flex: 1 1 12rem;
+}
