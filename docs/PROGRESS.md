@@ -29,6 +29,14 @@ Update at the end of every working session. Newest entry on top.
 
 ## Session log
 
+### 2026-11-14: Docker image for the Render API
+
+- **Done:** Added `backend/Dockerfile` so Render can build the Java API. The server listens on `PORT` when Render sets it, otherwise 8080.
+- **Files changed:** `backend/Dockerfile`, `backend/.dockerignore`, `application.yml`.
+- **Decisions:** Direct Temurin 21 image. Skip tests in the image build; CI still runs them. Free Render instance is acceptable for a first boot.
+- **Tests run / results:** Not executed. Pushed so Render can build it.
+- **Next step:** Redeploy the Render service. Root directory `backend`, Dockerfile path `Dockerfile`.
+
 ### 2026-11-14: Home stylesheet under the production budget
 
 - **Done:** Removed the old signed-in Home styles (resume sheet, job tabs, keyword box). Signed-in Home is ATS global, so those rules were unused and pushed `home-page.scss` 205 bytes over the 8 kB error budget.
