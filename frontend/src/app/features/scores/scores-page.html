@@ -1,16 +1,18 @@
 <section class="page scores" aria-labelledby="scores-heading">
-  <h1 id="scores-heading">ATS global</h1>
-  <p class="lede">
-    Newest posting first. The plot puts the day you saved the job on the horizontal axis and the Vettyou estimate on
-    the vertical axis. Select a point or a row for matched, partial, and missing requirements, the saved posting, and
-    that job's tailored resume. The dashed line is 78, a personal apply line, not an employer's cutoff.
-  </p>
+  <header class="top">
+    <div>
+      <h1 id="scores-heading">ATS global</h1>
+      <p class="lede">
+        Newest first. The dashed line is {{ applyLine }}, your apply line. The number is a Vettyou estimate.
+      </p>
+    </div>
+    <a class="btn ghost" routerLink="/jobs">Match a posting</a>
+  </header>
   @if (missing()) {
     <p class="lede"><a routerLink="/login">Log in</a> to see ATS global.</p>
   } @else if (loading()) {
     <p class="lede" role="status">Loading…</p>
   } @else {
-    <p class="lede"><a routerLink="/jobs">Match a new posting</a></p>
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     }
@@ -38,7 +40,7 @@
               [attr.y2]="plot().applyY"
             />
             <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().y100 + 4" text-anchor="end">100</text>
-            <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().applyY + 4" text-anchor="end">78</text>
+            <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().applyY + 4" text-anchor="end">{{ applyLine }}</text>
             <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().y50 + 4" text-anchor="end">50</text>
             <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().y0 + 4" text-anchor="end">0</text>
             <text class="axis" [attr.x]="plot().left" [attr.y]="plot().bottom + 28">{{ plot().minLabel }}</text>
@@ -67,10 +69,10 @@
           }
         </div>
         <p class="legend">
-          <span><i class="swatch over"></i>78 or above</span>
-          <span><i class="swatch watch"></i>78 or above, hard requirement open</span>
-          <span><i class="swatch under"></i>Under 78</span>
-          <span>Dashed line is 78</span>
+          <span><i class="swatch over"></i>{{ applyLine }} or above</span>
+          <span><i class="swatch watch"></i>{{ applyLine }} or above, hard requirement open</span>
+          <span><i class="swatch under"></i>Under {{ applyLine }}</span>
+          <span>Dashed line is {{ applyLine }}</span>
         </p>
       </section>
 
@@ -87,7 +89,7 @@
               }
               saved {{ posting.createdAt | date: 'MMM d, y' }}
             </p>
-            <p class="banner" [class.over]="banner() === '78 or above'" [class.watch]="banner() === '78 or above, hard requirement open'" [class.under]="banner() === 'Under 78'">
+            <p class="banner" [attr.data-tone]="tone()">
               @if (opened()?.score?.total != null) {
                 Vettyou estimate {{ opened()?.score?.total }}/100 · {{ banner() }}
               } @else if (posting.score.total != null) {
@@ -174,7 +176,7 @@
             @for (row of rows(); track row.postingId) {
               <tr [class.sel]="openedPosting()?.id === row.postingId">
                 <td>{{ row.createdAt | date: 'MMM d' }}</td>
-                <td class="num">
+                <td class="num" [attr.data-tone]="toneOf(row)">
                   @if (row.total !== null) {
                     {{ row.total }}
                   } @else {

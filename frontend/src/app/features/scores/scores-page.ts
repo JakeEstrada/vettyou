@@ -16,7 +16,7 @@ import { messageOf } from '../../core/auth/session';
 import { ResumePreview } from '../resume/resume-preview';
 
 /** Personal apply line on the plot. Not an employer cutoff. */
-export const APPLY_LINE = 78;
+export const APPLY_LINE = 75;
 
 export interface ScoreRow {
   postingId: string;
@@ -79,6 +79,8 @@ export class ScoresPage {
 
   readonly banner = computed(() => lineOf(this.openedRow()));
 
+  readonly tone = computed(() => toneOf(this.openedRow()));
+
   readonly plot = computed(() => buildPlot(this.rows()));
 
   constructor() {
@@ -86,6 +88,8 @@ export class ScoresPage {
   }
 
   lineOf = lineOf;
+
+  toneOf = toneOf;
 
   openById(id: string): void {
     const row = this.rows().find((item) => item.postingId === id);
@@ -200,16 +204,30 @@ export function coverageBuckets(requirements: RequirementMatch[]): CoverageBucke
 }
 
 export function lineOf(row: ScoreRow | null): string {
-  if (!row || row.total === null) {
+  const tone = toneOf(row);
+  if (tone === 'none') {
     return 'No estimate yet';
   }
+  if (tone === 'under') {
+    return `Under ${APPLY_LINE}`;
+  }
+  if (tone === 'watch') {
+    return `${APPLY_LINE} or above, hard requirement open`;
+  }
+  return `${APPLY_LINE} or above`;
+}
+
+export function toneOf(row: ScoreRow | null): 'over' | 'watch' | 'under' | 'none' {
+  if (!row || row.total === null) {
+    return 'none';
+  }
   if (row.total < APPLY_LINE) {
-    return 'Under 78';
+    return 'under';
   }
   if (row.toAnswer > 0) {
-    return '78 or above, hard requirement open';
+    return 'watch';
   }
-  return '78 or above';
+  return 'over';
 }
 
 function rowOf(
@@ -257,10 +275,10 @@ export interface PlotLayout {
 }
 
 function buildPlot(rows: ScoreRow[]): PlotLayout {
-  const left = 56;
+  const left = 48;
   const right = 820;
-  const top = 24;
-  const bottom = 360;
+  const top = 16;
+  const bottom = 248;
   const yAt = (total: number) => bottom - (total / 100) * (bottom - top);
   const scored = rows.filter((row) => row.total !== null);
   const times = scored.map((row) => Date.parse(row.createdAt)).filter((value) => !Number.isNaN(value));
@@ -276,7 +294,7 @@ function buildPlot(rows: ScoreRow[]): PlotLayout {
   };
   return {
     width: 860,
-    height: 420,
+    height: 292,
     left,
     right,
     top,
@@ -286,7 +304,7 @@ function buildPlot(rows: ScoreRow[]): PlotLayout {
     y50: yAt(50),
     y100: yAt(100),
     minLabel: dayLabel(minT),
-    maxLabel: dayLabel(maxT),
+    maxLabel: dayLabel(minT) === dayLabel(maxT) ? '' : dayLabel(maxT),
     dots: scored.map((row) => ({
       postingId: row.postingId,
       x: xAt(row.createdAt),

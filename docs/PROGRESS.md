@@ -29,6 +29,14 @@ Update at the end of every working session. Newest entry on top.
 
 ## Session log
 
+### 2026-11-14: ATS global apply line 75, dark dashboard
+
+- **Done:** The dashed apply line is 75. ATS global uses the app’s dark surface: left-aligned header, dark panels, copper line, muted table, coverage colored by the line.
+- **Files changed:** `scores-page.ts`, `scores-page.html`, `scores-page.scss`, `scores-page.spec.ts`.
+- **Decisions:** 75 is still a personal apply line, not an employer cutoff. The score stays a Vettyou estimate.
+- **Tests run / results:** Home and ATS global specs, 4 passed. Live page at `http://127.0.0.1:4200/`: plot axis reads 75, cards are `#101218` on the dark app, date cells no longer wrap.
+- **Next step:** Refresh Home if the old white panels are still on screen.
+
 ### 2026-11-14: ATS global dashboard, job.md, auto-built resume
 
 - **Done:** Signed-in Home is ATS global (scatter of date vs Vettyou estimate, dashed 78 apply line, table newest first, click-through to matched/partial/missing, posting text, tailored resume). Nav Scores renamed to ATS global. Each matched posting gets a tailored resume if none exists. Saved posting downloads as `job.md`. Score stays a Vettyou estimate.

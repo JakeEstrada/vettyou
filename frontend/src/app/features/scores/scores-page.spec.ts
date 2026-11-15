@@ -123,7 +123,7 @@ describe('ScoresPage', () => {
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('ATS global');
     expect(text).toContain('Engineer');
-    expect(text).toContain('78 or above');
+    expect(text).toContain('75 or above');
     expect(text).not.toContain('ATS score:');
     expect(fixture.nativeElement.querySelector('circle.over')).toBeTruthy();
 
