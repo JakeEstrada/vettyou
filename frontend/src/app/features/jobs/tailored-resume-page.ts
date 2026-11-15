@@ -19,6 +19,7 @@ import {
   WorkOnItem,
 } from '../../core/api/tailored-resume-api';
 import { messageOf } from '../../core/auth/session';
+import { ResumePreview } from '../resume/resume-preview';
 import { STATUS_LABELS } from './requirement-item';
 
 const GROUP_NAMES: Record<MatchGroup, string> = {
@@ -52,7 +53,7 @@ function same(a: string, b: string): boolean {
 
 @Component({
   selector: 'app-tailored-resume-page',
-  imports: [RouterLink, DatePipe, ReactiveFormsModule],
+  imports: [RouterLink, DatePipe, ReactiveFormsModule, ResumePreview],
   templateUrl: './tailored-resume-page.html',
   styleUrl: './tailored-resume-page.scss',
 })
@@ -81,13 +82,13 @@ export class TailoredResumePage {
 
   readonly version = new FormControl('', { nonNullable: true });
 
+  readonly picked = signal('');
+
   readonly link = useLink;
 
   readonly canBuild = computed(() => this.posting()?.status === 'ready');
 
   readonly pdfUrl = computed(() => this.fileUrl('resume.pdf'));
-
-  readonly previewUrl = computed(() => this.fileUrl('preview.png'));
 
   readonly passed = computed(() => this.resume()?.checks.filter((check) => check.passed).length ?? 0);
 
@@ -120,6 +121,7 @@ export class TailoredResumePage {
     this.api.build(this.postingId()).subscribe({
       next: (resume) => {
         this.building.set(false);
+        this.picked.set('');
         this.resume.set(resume);
         this.versions.update((versions) => [
           { id: resume.id, version: resume.version, createdAt: resume.createdAt, total: resume.score.total },
@@ -168,6 +170,10 @@ export class TailoredResumePage {
     return item.part && !same(item.part, item.requirement) ? item.requirement : '';
   }
 
+  choose(text: string): void {
+    this.picked.update((current) => (current === text ? '' : text));
+  }
+
   suggestionLink(suggestion: ResumeSuggestion): string[] | null {
     return suggestion.sourceId ? useLink({ kind: suggestion.sourceKind, id: suggestion.sourceId }) : null;
   }
@@ -190,7 +196,7 @@ export class TailoredResumePage {
     return `${(factor.activeWeight * factor.value).toFixed(1)} of ${Number(factor.activeWeight.toFixed(1))}`;
   }
 
-  private fileUrl(file: 'resume.pdf' | 'preview.png'): string {
+  private fileUrl(file: 'resume.pdf'): string {
     const resume = this.resume();
     return resume ? resumeFileUrl(resume.postingId, resume.id, file) : '';
   }
@@ -225,6 +231,7 @@ export class TailoredResumePage {
     this.api.get(this.postingId(), id).subscribe({
       next: (resume) => {
         this.opening.set(false);
+        this.picked.set('');
         this.resume.set(resume);
       },
       error: (error: unknown) => {

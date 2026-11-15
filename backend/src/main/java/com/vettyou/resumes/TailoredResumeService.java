@@ -106,6 +106,14 @@ public class TailoredResumeService {
 		return resumes.summaries(postingId, userId);
 	}
 
+	/** Builds version 1 when this posting has none. Does not add versions on rematch. */
+	public void ensureBuilt(UUID userId, UUID postingId) {
+		if (!list(userId, postingId).isEmpty()) {
+			return;
+		}
+		build(userId, postingId);
+	}
+
 	@Transactional(readOnly = true)
 	public TailoredResumeResponse get(UUID userId, UUID postingId, UUID id) {
 		TailoredResume resume = owned(userId, postingId, id);
@@ -155,14 +163,46 @@ public class TailoredResumeService {
 		return List.copyOf(reasons);
 	}
 
-	private static TailoredResumeResponse response(TailoredResume resume, Snapshot snapshot, List<String> stale) {
+	private TailoredResumeResponse response(TailoredResume resume, Snapshot snapshot, List<String> stale) {
 		return new TailoredResumeResponse(resume.getId(), resume.getPostingId(), resume.getVersion(),
 				resume.getTemplate(), resume.getCreatedAt(), snapshot.postingTitle(), snapshot.postingCompany(),
 				!stale.isEmpty(), stale, snapshot.match().score(), snapshot.evidenceTotal(),
 				snapshot.evidenceTotalIfConfirmed(), snapshot.match().requirements(), snapshot.readability(),
 				snapshot.checks(), snapshot.lines(), snapshot.leftOff(), snapshot.toConfirm(), snapshot.skills(),
 				snapshot.skillsLeftOff(), snapshot.suggestions(), snapshot.workOn(), snapshot.document(),
-				resume.getPlainText(), snapshot.pages(), resume.getPdfSha256());
+				resume.getPlainText(), snapshot.pages(), resume.getPdfSha256(), highlights(snapshot));
+	}
+
+	/** Boxes on the first-page PNG for printed lines that count toward the estimate. */
+	private List<ResumeHighlight> highlights(Snapshot snapshot) {
+		List<ResumeLine> scored = snapshot.lines().stream().filter((line) -> !line.backs().isEmpty()).toList();
+		if (scored.isEmpty()) {
+			return List.of();
+		}
+		Map<String, String> why = new LinkedHashMap<>();
+		for (ResumeLine line : scored) {
+			why.putIfAbsent(line.text(), why(line));
+		}
+		List<ResumeHighlight> marks = new ArrayList<>();
+		for (AtsFirstTemplate.Mark mark : template.marks(snapshot.document(), List.copyOf(why.keySet()))) {
+			marks.add(new ResumeHighlight(mark.text(), why.getOrDefault(mark.text(), ""),
+					mark.boxes().stream()
+						.map((box) -> new HighlightBox(box.x(), box.y(), box.width(), box.height()))
+						.toList()));
+		}
+		return List.copyOf(marks);
+	}
+
+	private static String why(ResumeLine line) {
+		LinkedHashMap<String, Boolean> parts = new LinkedHashMap<>();
+		for (var back : line.backs()) {
+			String text = back.part() + " — " + back.requirement();
+			if ("transferable".equals(back.support())) {
+				text += " (transferable)";
+			}
+			parts.putIfAbsent(text, true);
+		}
+		return String.join("; ", parts.keySet());
 	}
 
 	/** Changes to the person's own data that would let the next version show more. */

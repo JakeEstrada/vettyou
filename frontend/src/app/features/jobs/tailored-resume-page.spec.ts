@@ -209,6 +209,13 @@ const resume: TailoredResume = {
   plainText: 'Ada Lovelace\nEXPERIENCE',
   pages: 1,
   pdfSha256: 'abc',
+  highlights: [
+    {
+      text: 'Built React screens backed by PostgreSQL',
+      why: 'React — React',
+      boxes: [{ x: 80, y: 400, width: 400, height: 18 }],
+    },
+  ],
 };
 
 const older: TailoredResumeSummary = { id: 'rv1', version: 1, createdAt: '2026-11-07T18:00:00Z', total: 73 };
@@ -277,6 +284,12 @@ describe('TailoredResumePage', () => {
     const preview = element.querySelector<HTMLImageElement>('.preview img')!;
     expect(preview.getAttribute('src')).toBe('/api/v1/jobs/jp1/resumes/rv1/preview.png');
     expect(preview.alt).toContain('Page 1 of the resume');
+    const hit = element.querySelector<HTMLButtonElement>('.hit')!;
+    expect(hit.getAttribute('aria-label')).toContain('Built React screens backed by PostgreSQL');
+    hit.click();
+    fixture.detectChanges();
+    expect(element.textContent).toContain('Why this line.');
+    expect(element.textContent).toContain('React — React');
     http.verify();
   });
 

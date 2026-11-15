@@ -6,7 +6,28 @@ import { provideRouter } from '@angular/router';
 import { HomePage } from './home-page';
 
 describe('HomePage', () => {
-  it('shows the name, job title, a kept skill, and marks a typed keyword', async () => {
+  it('shows a product homepage when nobody is signed in', async () => {
+    await TestBed.configureTestingModule({
+      imports: [HomePage],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(HomePage);
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne('/api/v1/profile').flush({ message: 'Sign in required.' }, { status: 401, statusText: 'Unauthorized' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('A resume from what you can prove.');
+    expect(text).toContain('Vettyou estimate');
+    expect(text).toContain('Create an account');
+    expect(text).toContain('Log in');
+    expect(text).toContain('never invents');
+    http.verify();
+  });
+
+  it('shows ATS global when signed in', async () => {
     await TestBed.configureTestingModule({
       imports: [HomePage],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
@@ -22,46 +43,17 @@ describe('HomePage', () => {
       website: '',
       linkedin: '',
     });
-    http.expectOne('/api/v1/experiences').flush([
-      { id: 'j1', employer: 'Acme', title: 'Full Stack Engineer', startDate: null, endDate: null, current: true },
-    ]);
-    http.expectOne('/api/v1/educations').flush([]);
-    http.expectOne('/api/v1/projects').flush([]);
-    http.expectOne('/api/v1/skills').flush([
-      {
-        name: 'React',
-        category: 'framework',
-        status: 'kept',
-        places: 2,
-        uses: [{ kind: 'job', id: 'j1', label: 'Acme', quote: 'Built React screens', status: 'kept' }],
-      },
-    ]);
+    await fixture.whenStable();
+    fixture.detectChanges();
     http.expectOne('/api/v1/jobs').flush([]);
-    http.expectOne('/api/v1/applications').flush([]);
-    http.expectOne('/api/v1/experiences/j1').flush({
-      id: 'j1',
-      employer: 'Acme',
-      title: 'Full Stack Engineer',
-      location: '',
-      startDate: null,
-      endDate: null,
-      current: true,
-      body: 'Built React screens',
-      versions: [],
-    });
     await fixture.whenStable();
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Jake Estrada');
-    expect(text).toContain('Full Stack Engineer');
-    expect(text).toContain('React');
-    expect(text).toContain('Acme');
-
-    fixture.componentInstance.keywords.setValue('React, Kubernetes');
-    fixture.detectChanges();
-    expect(fixture.componentInstance.missingWords()).toEqual(['Kubernetes']);
-    expect(fixture.nativeElement.querySelector('mark')?.textContent).toBe('React');
+    expect(text).toContain('ATS global');
+    expect(text).toContain('No matches yet');
+    expect(text).toContain('Vettyou estimate');
+    expect(text).not.toContain('ATS score:');
     http.verify();
   });
 });

@@ -202,6 +202,7 @@ describe('JobMatchPage', () => {
     expect(page.busy()).toBe(true);
     vi.advanceTimersByTime(2000);
     http.expectOne('/api/v1/jobs/jp1').flush(ready);
+    http.expectOne('/api/v1/jobs/jp1/resumes').flush([]);
     vi.advanceTimersByTime(4000);
     http.expectNone('/api/v1/jobs/jp1');
 
@@ -215,6 +216,7 @@ describe('JobMatchPage', () => {
     const text = element.textContent ?? '';
     expect(text).toContain('69');
     expect(text).toContain('Vettyou estimate');
+    expect(text).toContain('to see this estimate marked on the PDF');
     expect(text).toContain('85/100 if you confirm 1 flagged project line');
     expect(text).toContain('How it adds up: 100 x (50 x 1.0000');
     expect(text).toContain('weight 15 × 67% coverage = 10.1');
@@ -233,6 +235,8 @@ describe('JobMatchPage', () => {
     }
     expect(text).toContain('“Owned systems from requirements discovery”');
     expect(text).toContain('not confirmed yet');
+    expect(text).toContain('Download job.md');
+    expect(element.querySelector('a[href="/api/v1/jobs/jp1/posting.md"]')).toBeTruthy();
     expect(text).not.toContain('ATS score:');
 
     const meets = Array.from(element.querySelectorAll('button')).filter((button) =>
@@ -250,6 +254,7 @@ describe('JobMatchPage', () => {
     const { page, http } = await setup();
     vi.advanceTimersByTime(0);
     http.expectOne('/api/v1/jobs/jp1').flush(ready);
+    http.expectOne('/api/v1/jobs/jp1/resumes').flush([]);
 
     page.answer(authorized, 'meets');
     const save = http.expectOne('/api/v1/jobs/jp1/requirements/r4/answer');
@@ -275,6 +280,7 @@ describe('JobMatchPage', () => {
     const { page, http } = await setup();
     vi.advanceTimersByTime(0);
     http.expectOne('/api/v1/jobs/jp1').flush({ ...ready, evidenceChanged: true });
+    http.expectOne('/api/v1/jobs/jp1/resumes').flush([]);
 
     page.rematch();
     const start = http.expectOne('/api/v1/jobs/jp1/match');
@@ -286,9 +292,47 @@ describe('JobMatchPage', () => {
     http.expectOne('/api/v1/jobs/jp1').flush({ ...ready, status: 'matching' });
     vi.advanceTimersByTime(2000);
     http.expectOne('/api/v1/jobs/jp1').flush(ready);
+    http.expectOne('/api/v1/jobs/jp1/resumes').flush([]);
     expect(page.posting()?.evidenceChanged).toBe(false);
     vi.advanceTimersByTime(4000);
     http.expectNone('/api/v1/jobs/jp1');
+    http.verify();
+  });
+
+  it('marks scored lines on the resume PDF next to the estimate', async () => {
+    const { fixture, page, http } = await setup();
+    vi.advanceTimersByTime(0);
+    http.expectOne('/api/v1/jobs/jp1').flush(ready);
+    http.expectOne('/api/v1/jobs/jp1/resumes').flush([
+      { id: 'rv1', version: 1, createdAt: '2026-11-07T18:00:00Z', total: 73 },
+    ]);
+    http.expectOne('/api/v1/jobs/jp1/resumes/rv1').flush({
+      id: 'rv1',
+      postingId: 'jp1',
+      highlights: [
+        {
+          text: 'Built React screens backed by PostgreSQL',
+          why: 'React — React',
+          boxes: [{ x: 80, y: 400, width: 400, height: 18 }],
+        },
+      ],
+    });
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector<HTMLImageElement>('.preview img')?.getAttribute('src')).toBe(
+      '/api/v1/jobs/jp1/resumes/rv1/preview.png',
+    );
+    const hit = element.querySelector<HTMLButtonElement>('.hit')!;
+    expect(hit.getAttribute('aria-label')).toContain('Built React screens backed by PostgreSQL');
+    hit.click();
+    fixture.detectChanges();
+    expect(element.textContent).toContain('Why this line.');
+    expect(element.textContent).toContain('React — React');
+    expect(element.textContent).toContain('Show on resume');
+
+    page.showOnResume('React');
+    expect(page.picked()).toBe('Built React screens backed by PostgreSQL');
     http.verify();
   });
 });

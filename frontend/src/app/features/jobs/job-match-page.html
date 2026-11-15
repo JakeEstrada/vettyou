@@ -37,7 +37,7 @@
     }
 
     @if (busy()) {
-      <p class="hint center" role="status">This usually takes 20 to 90 seconds. The page updates on its own.</p>
+      <p class="hint center" role="status">This can take a couple of minutes. The page updates on its own.</p>
     } @else if (posting.status === 'failed') {
       <p class="form-error center" role="alert">{{ posting.error }}</p>
       <p class="center"><button type="button" class="btn" (click)="reread()">Try again</button></p>
@@ -49,52 +49,71 @@
         </p>
       }
 
-      <section class="score" aria-labelledby="score-heading">
-        <h2 id="score-heading" class="sr-only">Score</h2>
-        @if (posting.score.total !== null) {
-          <p class="total">
-            <span class="number">{{ posting.score.total }}</span><span class="out-of">/100</span>
-          </p>
-        } @else {
-          <p class="total"><span class="out-of">Nothing can be scored yet</span></p>
-        }
-        <p class="label">{{ posting.score.label }}</p>
-        <p class="hint">{{ posting.score.note }}</p>
-        @if (showIfConfirmed()) {
-          <p class="if-confirmed">
-            {{ posting.score.totalIfConfirmed }}/100 if you confirm {{ posting.score.toConfirm }} flagged project
-            {{ posting.score.toConfirm === 1 ? 'line' : 'lines' }} on your <a routerLink="/projects">project pages</a>.
-          </p>
-        }
-        @if (posting.score.toAnswer > 0) {
-          <p class="if-confirmed">
-            {{ posting.score.toAnswer }} {{ posting.score.toAnswer === 1 ? 'item needs' : 'items need' }} your answer
-            before {{ posting.score.toAnswer === 1 ? 'it counts' : 'they count' }}.
-          </p>
-        }
-        <dl class="factors">
-          @for (factor of posting.score.factors; track factor.key) {
-            <div [class.left-out]="factor.value === null">
-              <dt>
-                {{ factor.label }} <span class="weight">{{ weight(factor) }}</span>
-              </dt>
-              <dd>
-                <span class="bar" aria-hidden="true"><span [style.width.%]="(factor.value ?? 0) * 100"></span></span>
-                {{ percent(factor.value) }} · {{ points(factor) }}
-                @if (factor.valueIfConfirmed !== factor.value && factor.valueIfConfirmed !== null) {
-                  <span class="weight">({{ percent(factor.valueIfConfirmed) }} if confirmed)</span>
-                }
-              </dd>
-              <dd class="explain">{{ factor.how }}</dd>
-            </div>
+      <div class="score-and-pdf">
+        <section class="score" aria-labelledby="score-heading">
+          <h2 id="score-heading" class="sr-only">Score</h2>
+          @if (posting.score.total !== null) {
+            <p class="total">
+              <span class="number">{{ posting.score.total }}</span><span class="out-of">/100</span>
+            </p>
+          } @else {
+            <p class="total"><span class="out-of">Nothing can be scored yet</span></p>
           }
-        </dl>
-        <p class="formula"><span>How it adds up:</span> {{ posting.score.formula }}</p>
-        <p class="share">
-          <a class="btn" [routerLink]="['/jobs', posting.id, 'resume']">Tailored resume</a>
-          <a class="btn ghost" [routerLink]="['/jobs', posting.id, 'report']">Report to share (PDF or text)</a>
-        </p>
-      </section>
+          <p class="label">{{ posting.score.label }}</p>
+          <p class="hint">{{ posting.score.note }}</p>
+          @if (showIfConfirmed()) {
+            <p class="if-confirmed">
+              {{ posting.score.totalIfConfirmed }}/100 if you confirm {{ posting.score.toConfirm }} flagged project
+              {{ posting.score.toConfirm === 1 ? 'line' : 'lines' }} on your <a routerLink="/projects">project pages</a>.
+            </p>
+          }
+          @if (posting.score.toAnswer > 0) {
+            <p class="if-confirmed">
+              {{ posting.score.toAnswer }} {{ posting.score.toAnswer === 1 ? 'item needs' : 'items need' }} your answer
+              before {{ posting.score.toAnswer === 1 ? 'it counts' : 'they count' }}.
+            </p>
+          }
+          <dl class="factors">
+            @for (factor of posting.score.factors; track factor.key) {
+              <div [class.left-out]="factor.value === null">
+                <dt>
+                  {{ factor.label }} <span class="weight">{{ weight(factor) }}</span>
+                </dt>
+                <dd>
+                  <span class="bar" aria-hidden="true"><span [style.width.%]="(factor.value ?? 0) * 100"></span></span>
+                  {{ percent(factor.value) }} · {{ points(factor) }}
+                  @if (factor.valueIfConfirmed !== factor.value && factor.valueIfConfirmed !== null) {
+                    <span class="weight">({{ percent(factor.valueIfConfirmed) }} if confirmed)</span>
+                  }
+                </dd>
+                <dd class="explain">{{ factor.how }}</dd>
+              </div>
+            }
+          </dl>
+          <p class="formula"><span>How it adds up:</span> {{ posting.score.formula }}</p>
+          <p class="share">
+            <a class="btn" [routerLink]="['/jobs', posting.id, 'resume']">Tailored resume</a>
+            <a class="btn ghost" [routerLink]="['/jobs', posting.id, 'report']">Report to share (PDF or text)</a>
+          </p>
+        </section>
+        <aside class="pdf-pane" aria-label="Resume page with the lines this estimate is reading">
+          @if (resume(); as resume) {
+            <app-resume-preview
+              [postingId]="resume.postingId"
+              [resumeId]="resume.id"
+              [highlights]="resume.highlights"
+              [picked]="picked()"
+              (pick)="choose($event)"
+            />
+          } @else {
+            <p class="hint">
+              Build a
+              <a [routerLink]="['/jobs', posting.id, 'resume']">tailored resume</a>
+              to see this estimate marked on the PDF.
+            </p>
+          }
+        </aside>
+      </div>
 
       <section class="readiness" aria-labelledby="readiness-heading">
         <h2 id="readiness-heading">Application readiness <span class="weight">not part of the score</span></h2>
@@ -115,8 +134,10 @@
                   <app-requirement-item
                     [item]="item"
                     [saving]="answering() === item.id"
+                    [canShow]="!!resume()"
                     (answered)="answer(item, $event)"
                     (removed)="removeRequirement(item)"
+                    (show)="showOnResume(item.skill)"
                   />
                 </li>
               }
@@ -171,6 +192,9 @@
 
       <section class="section" aria-labelledby="posting-heading">
         <h2 id="posting-heading">The posting</h2>
+        <p>
+          <a [href]="markdownUrl(posting.id)">Download job.md</a>
+        </p>
         <details>
           <summary>{{ posting.reader === 'history' ? 'Show the saved posting' : 'Show the text you pasted' }}</summary>
           <pre>{{ posting.body }}</pre>

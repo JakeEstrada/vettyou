@@ -1,0 +1,36 @@
+<figure class="preview">
+  <div class="page">
+    <img
+      [src]="previewUrl()"
+      [attr.width]="pageWidth"
+      [attr.height]="pageHeight"
+      alt="Page 1 of the resume. Copper marks are the lines this estimate is reading."
+    />
+    @for (mark of highlights(); track mark.text) {
+      @for (box of mark.boxes; track $index) {
+        <button
+          type="button"
+          class="hit"
+          [class.on]="picked() === mark.text"
+          [style.left]="left(box.x)"
+          [style.top]="top(box.y)"
+          [style.width]="width(box.width)"
+          [style.height]="height(box.height)"
+          [attr.aria-pressed]="picked() === mark.text"
+          [attr.aria-label]="'This line counts toward the estimate: ' + mark.text"
+          (click)="choose(mark.text)"
+        ></button>
+      }
+    }
+  </div>
+  <figcaption class="hint">
+    @if (why()) {
+      <strong>Why this line.</strong> {{ why() }}
+    } @else if (highlights().length > 0) {
+      Copper marks are the lines this estimate is reading. Select one to see which posting item it shows.
+    } @else {
+      Page 1 as the PDF draws it. No printed line counted toward this estimate.
+    }
+    <a [href]="pdfUrl()" target="_blank" rel="noopener">Open the PDF</a>
+  </figcaption>
+</figure>

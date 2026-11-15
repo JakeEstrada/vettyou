@@ -73,6 +73,12 @@ public class JobService {
 		return report.pdf(ready(userId, id));
 	}
 
+	/** The posting text as saved, for a job.md download. Available as soon as the paste is stored. */
+	@Transactional(readOnly = true)
+	public String postingMarkdown(UUID userId, UUID id) {
+		return owned(userId, id).getBody();
+	}
+
 	/** Reads the posting again from scratch. Requirements are replaced, so answers are cleared. */
 	@Transactional
 	public JobPostingSummary reread(UUID userId, UUID id) {

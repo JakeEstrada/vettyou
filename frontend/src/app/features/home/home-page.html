@@ -1,122 +1,77 @@
-<section class="home" aria-labelledby="home-heading">
-  <h1 id="home-heading" class="sr-only">Home</h1>
+<section class="home">
   @if (loading()) {
+    <h1 id="home-heading" class="sr-only">Home</h1>
     <p class="lede" role="status">Loading…</p>
-  } @else if (error()) {
-    <p class="form-error" role="alert">{{ error() }}</p>
   } @else if (missing()) {
-    <p class="lede">Your experience, in your words.</p>
-    <p class="lede"><a routerLink="/register">Create an account</a> or <a routerLink="/login">log in</a>.</p>
-  } @else {
-    <div class="hero">
-      <div class="stage">
-        <app-resume-sheet [model]="sheet()" [marks]="marks()" />
-      </div>
-      <aside class="identity">
-        <p class="name">{{ profile()?.displayName || 'Your name' }}</p>
-        @if (role()) {
-          <p class="role">{{ role() }}</p>
-        } @else {
-          <p class="role muted">Add a job title on your resume.</p>
-        }
-        <p class="fine">Kept skills, with the job or project they came from. Nothing is invented.</p>
-        @if (topSkills().length === 0) {
-          <p class="muted">Keep skills on a project or name them in a job write-up.</p>
-        } @else {
-          <ul class="skill-list">
-            @for (skill of topSkills(); track skill.name) {
-              <li>
-                <strong>{{ skill.name }}</strong>
-                <span class="muted">{{ skill.places }} {{ skill.places === 1 ? 'place' : 'places' }}</span>
-                <ul class="sources">
-                  @for (source of skill.sources; track source.label) {
-                    <li><a [routerLink]="source.link">{{ source.label }}</a></li>
-                  }
-                </ul>
-              </li>
-            }
-          </ul>
-        }
-        <p class="links">
-          <a routerLink="/resume" [queryParams]="{ view: 'master' }">Edit resume</a>
-          <a routerLink="/skills">All skills</a>
+    <div class="landing">
+      <header class="intro">
+        <p class="eyebrow">Evidence-grounded resumes</p>
+        <h1 id="home-heading">A resume from what you can prove.</h1>
+        <p class="lede">
+          Paste a job. Vettyou lines it up with the work you wrote and the READMEs you uploaded. It never invents a
+          skill, title, date, or number. The score is a Vettyou estimate, not an employer ATS score.
         </p>
-      </aside>
-    </div>
+        <p class="actions">
+          <a class="btn" routerLink="/register">Create an account</a>
+          <a class="btn ghost" routerLink="/login">Log in</a>
+        </p>
+      </header>
 
-    <section class="band" aria-labelledby="jobs-heading">
-      <h2 id="jobs-heading">Recent jobs</h2>
-      @if (recents().length === 0) {
-        <p class="muted">No postings yet. <a routerLink="/jobs">Paste a job</a>.</p>
-      } @else {
-        <ul class="job-tabs">
-          @for (item of recents(); track item.postingId) {
-            <li>
-              <button
-                type="button"
-                [attr.aria-current]="selected()?.id === item.postingId ? 'true' : null"
-                (click)="openJob(item)"
-              >
-                {{ item.title }}
-                @if (item.company) {
-                  <span>{{ item.company }}</span>
-                }
-                @if (item.total !== null) {
-                  <span>Vettyou estimate {{ item.total }}/100</span>
-                }
-              </button>
-            </li>
-          }
-        </ul>
-      }
-
-      @if (selected(); as posting) {
-        <div class="job-grid">
-          <article>
-            <h3>{{ posting.title || 'Job posting' }}</h3>
-            @if (posting.company) {
-              <p class="muted">{{ posting.company }}</p>
-            }
-            @if (selectedTotal() !== null) {
-              <p class="estimate">Vettyou estimate {{ selectedTotal() }}/100</p>
-            }
-            <p class="fine">Our reading of the posting against your lines. Not an employer's applicant tracking score.</p>
-            <h4>Job description</h4>
-            <pre class="posting">{{ posting.body }}</pre>
-            <p>
-              <a [routerLink]="['/jobs', posting.id]">Open the match</a>
-              <a [routerLink]="['/jobs', posting.id, 'resume']">Tailored resume</a>
-            </p>
+      <div class="demo" aria-hidden="true">
+        <div class="boards">
+          <article class="card job-card">
+            <p class="card-kicker">Job posting</p>
+            <h2>Staff engineer</h2>
+            <ul>
+              <li class="need hit">Java</li>
+              <li class="need hit">PostgreSQL</li>
+              <li class="need miss">Secret clearance</li>
+            </ul>
           </article>
-          <article>
-            <label>
-              Keywords
-              <textarea
-                [formControl]="keywords"
-                rows="4"
-                placeholder="React, PostgreSQL, Kubernetes"
-              ></textarea>
-            </label>
-            <p class="fine">Words you type are marked on the resume. Missing ones are listed here. They are not added to the resume.</p>
-            @if (marks().length === 0) {
-              <p class="muted">Type a word from the posting.</p>
-            } @else if (missingWords().length === 0) {
-              <p>Every typed word is already on the resume.</p>
-            } @else {
-              <p>Missing from the resume</p>
-              <ul class="missing">
-                @for (word of missingWords(); track word) {
-                  <li>{{ word }}</li>
-                }
-              </ul>
-            }
+          <article class="card mini-sheet">
+            <header>
+              <p class="who">Your name</p>
+              <p class="what">The work you described</p>
+            </header>
+            <ul>
+              <li class="line match">A Java service you wrote on the job</li>
+              <li class="line match">PostgreSQL from a project README</li>
+              <li class="line skip">A line that does not speak to this posting</li>
+            </ul>
+            <p class="score"><span>67</span>/100 <em>Vettyou estimate</em></p>
           </article>
         </div>
-      }
-    </section>
+        <p class="caption">
+          <span class="c1">You write the work in your words.</span>
+          <span class="c2">A posting is about the job, not about you.</span>
+          <span class="c3">Copper marks only the lines you can back up.</span>
+          <span class="c4">Unproven requirements stay unmatched. Nothing is invented.</span>
+        </p>
+      </div>
+      <p class="sr-only">
+        Animation: a job posting is compared with your resume. Matching lines get copper marks. A requirement you
+        cannot back up stays unmatched. The number is a Vettyou estimate.
+      </p>
 
-    <section class="band">
-      <app-application-tracker [items]="applications()" [openings]="recents()" />
-    </section>
+      <ol class="beats">
+        <li>
+          <strong>Write it once.</strong>
+          Jobs, projects, and READMEs stay yours. Claims are candidates until you approve them.
+        </li>
+        <li>
+          <strong>Paste a posting.</strong>
+          Requirements stay on the job. They are never treated as evidence about you.
+        </li>
+        <li>
+          <strong>Tailor from proof.</strong>
+          A new PDF for that application. Templates change look, not facts. Sent copies stay as they were.
+        </li>
+      </ol>
+    </div>
+  } @else if (error()) {
+    <h1 id="home-heading" class="sr-only">Home</h1>
+    <p class="form-error" role="alert">{{ error() }}</p>
+  } @else {
+    <app-scores-page />
   }
 </section>

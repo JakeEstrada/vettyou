@@ -1,11 +1,12 @@
 <section class="page scores" aria-labelledby="scores-heading">
-  <h1 id="scores-heading">Scores</h1>
+  <h1 id="scores-heading">ATS global</h1>
   <p class="lede">
-    A Vettyou estimate of the latest resume for each posting. It is our reading, not an employer's applicant tracking
-    score.
+    Newest posting first. The plot puts the day you saved the job on the horizontal axis and the Vettyou estimate on
+    the vertical axis. Select a point or a row for matched, partial, and missing requirements, the saved posting, and
+    that job's tailored resume. The dashed line is 78, a personal apply line, not an employer's cutoff.
   </p>
   @if (missing()) {
-    <p class="lede"><a routerLink="/login">Log in</a> to see scores.</p>
+    <p class="lede"><a routerLink="/login">Log in</a> to see ATS global.</p>
   } @else if (loading()) {
     <p class="lede" role="status">Loading…</p>
   } @else {
@@ -16,95 +17,194 @@
     @if (rows().length === 0) {
       <p class="lede">No matches yet.</p>
     } @else {
-      <ul class="activity">
-        @for (row of rows(); track row.postingId) {
-          <li>
-            <button type="button" class="open" [attr.aria-current]="opened()?.id === row.resumeId ? 'true' : null" (click)="open(row)">
-              <span class="title">
-                {{ row.title }}
-                @if (row.company) {
-                  <span class="company">{{ row.company }}</span>
-                }
-              </span>
-              <span class="meta">
-                @if (row.total !== null) {
-                  Vettyou estimate {{ row.total }}/100
-                } @else {
-                  No resume yet
-                }
-                @if (row.version !== null) {
-                  · version {{ row.version }}
-                }
-              </span>
-            </button>
-            @if (confirming() === row.postingId) {
-              <button type="button" class="btn danger small" [disabled]="deleting()" (click)="remove(row.postingId)">
-                Delete this match
-              </button>
-              <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
-            } @else {
-              <button type="button" class="btn ghost small" (click)="confirming.set(row.postingId)">Delete</button>
+      <section class="card" aria-labelledby="plot-heading">
+        <h2 id="plot-heading">Date and coverage</h2>
+        <div class="plot-wrap">
+          <svg
+            class="plot"
+            [attr.viewBox]="'0 0 ' + plot().width + ' ' + plot().height"
+            role="img"
+            aria-labelledby="plot-heading plot-desc"
+          >
+            <desc id="plot-desc">Scatter plot of Vettyou estimate by the date each job was saved.</desc>
+            <line class="grid" [attr.x1]="plot().left" [attr.x2]="plot().right" [attr.y1]="plot().y100" [attr.y2]="plot().y100" />
+            <line class="grid" [attr.x1]="plot().left" [attr.x2]="plot().right" [attr.y1]="plot().y50" [attr.y2]="plot().y50" />
+            <line class="grid" [attr.x1]="plot().left" [attr.x2]="plot().right" [attr.y1]="plot().y0" [attr.y2]="plot().y0" />
+            <line
+              class="apply"
+              [attr.x1]="plot().left"
+              [attr.x2]="plot().right"
+              [attr.y1]="plot().applyY"
+              [attr.y2]="plot().applyY"
+            />
+            <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().y100 + 4" text-anchor="end">100</text>
+            <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().applyY + 4" text-anchor="end">78</text>
+            <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().y50 + 4" text-anchor="end">50</text>
+            <text class="axis" [attr.x]="plot().left - 8" [attr.y]="plot().y0 + 4" text-anchor="end">0</text>
+            <text class="axis" [attr.x]="plot().left" [attr.y]="plot().bottom + 28">{{ plot().minLabel }}</text>
+            <text class="axis" [attr.x]="plot().right" [attr.y]="plot().bottom + 28" text-anchor="end">{{ plot().maxLabel }}</text>
+            @for (dot of plot().dots; track dot.postingId) {
+              <circle
+                [attr.cx]="dot.x"
+                [attr.cy]="dot.y"
+                r="8"
+                [class]="dot.tone"
+                [class.current]="openedPosting()?.id === dot.postingId"
+                tabindex="0"
+                role="button"
+                [attr.aria-label]="dot.label"
+                (click)="openById(dot.postingId)"
+                (keyup.enter)="openById(dot.postingId)"
+                (mouseenter)="hover.set(dot.label)"
+                (mouseleave)="hover.set('')"
+                (focus)="hover.set(dot.label)"
+                (blur)="hover.set('')"
+              />
             }
-          </li>
-        }
-      </ul>
-    }
-
-    @if (opening()) {
-      <p role="status">Opening…</p>
-    }
-    @if (opened(); as resume) {
-      <div class="detail">
-        <div>
-          <p class="estimate">
-            <strong>{{ resume.score.total ?? '—' }}</strong>
-            <span>/100</span>
-          </p>
-          <p class="hint">{{ resume.score.note || 'Vettyou estimate. Not an employer\'s applicant tracking score.' }}</p>
-          @if (resume.stale) {
-            <p class="hint">This version no longer matches your data. It stays as it was built.</p>
+          </svg>
+          @if (hover()) {
+            <p class="tip" role="status">{{ hover() }}</p>
           }
-          <h2>What to improve</h2>
-          @if (resume.suggestions.length === 0 && resume.workOn.length === 0) {
-            <p class="hint">Nothing else to change on this version.</p>
-          }
-          <ul>
-            @for (item of resume.suggestions; track item.text) {
-              <li>{{ item.text }}</li>
-            }
-            @for (item of resume.workOn.slice(0, 6); track item.requirement + item.part) {
-              <li>
-                {{ item.requirement }}
-                @if (item.part) {
-                  — {{ item.part }}
-                }
-                . {{ item.reason }}
-              </li>
-            }
-            @for (check of resume.checks; track check.key) {
-              @if (!check.passed && check.detail) {
-                <li>{{ check.detail }}</li>
-              }
-            }
-          </ul>
-          <p>
-            <a [routerLink]="['/jobs', resume.postingId, 'resume']">Open the full resume</a>
-          </p>
         </div>
-        @if (sheet(); as page) {
-          <div>
-            <app-resume-sheet [model]="page" [highlights]="highlights()" [picked]="picked()" (pick)="choose($event)" />
-            <p class="why">
-              @if (why()) {
-                <strong>Why this line.</strong> {{ why() }}
+        <p class="legend">
+          <span><i class="swatch over"></i>78 or above</span>
+          <span><i class="swatch watch"></i>78 or above, hard requirement open</span>
+          <span><i class="swatch under"></i>Under 78</span>
+          <span>Dashed line is 78</span>
+        </p>
+      </section>
+
+      @if (opening()) {
+        <p role="status">Opening…</p>
+      }
+      @if (openedPosting(); as posting) {
+        <section class="card detail" [attr.aria-labelledby]="'job-' + posting.id">
+          <div class="detail-copy">
+            <h2 [id]="'job-' + posting.id">{{ posting.title || 'Job posting' }}</h2>
+            <p class="meta">
+              @if (posting.company) {
+                {{ posting.company }} ·
+              }
+              saved {{ posting.createdAt | date: 'MMM d, y' }}
+            </p>
+            <p class="banner" [class.over]="banner() === '78 or above'" [class.watch]="banner() === '78 or above, hard requirement open'" [class.under]="banner() === 'Under 78'">
+              @if (opened()?.score?.total != null) {
+                Vettyou estimate {{ opened()?.score?.total }}/100 · {{ banner() }}
+              } @else if (posting.score.total != null) {
+                Vettyou estimate {{ posting.score.total }}/100 · {{ banner() }}
               } @else {
-                Marked lines are the ones that count toward the estimate. Select one to see which part of the posting
-                it shows.
+                {{ banner() }}
               }
             </p>
+            <p class="hint">{{ opened()?.score?.note || posting.score.note || 'Vettyou estimate. Not an employer\'s applicant tracking score.' }}</p>
+            @if (opened()?.stale) {
+              <p class="hint">This version no longer matches your data. It stays as it was built.</p>
+            }
+            <div class="cols">
+              <div>
+                <h3 class="ok">Matched</h3>
+                @if (buckets().matched.length === 0) {
+                  <p class="hint">None yet.</p>
+                } @else {
+                  <ul>
+                    @for (skill of buckets().matched; track skill) {
+                      <li>{{ skill }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+              <div>
+                <h3 class="part">Partial</h3>
+                @if (buckets().partial.length === 0) {
+                  <p class="hint">None.</p>
+                } @else {
+                  <ul>
+                    @for (skill of buckets().partial; track skill) {
+                      <li>{{ skill }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+              <div>
+                <h3 class="miss">Missing</h3>
+                @if (buckets().missing.length === 0) {
+                  <p class="hint">None.</p>
+                } @else {
+                  <ul>
+                    @for (skill of buckets().missing; track skill) {
+                      <li>{{ skill }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+            <p class="links">
+              <a [routerLink]="['/jobs', posting.id]">Open the match</a>
+              <a [routerLink]="['/jobs', posting.id, 'resume']">Tailored resume</a>
+              <a [href]="markdownUrl(posting.id)">Download job.md</a>
+            </p>
+            <h3>Saved posting</h3>
+            <pre class="posting">{{ posting.body }}</pre>
           </div>
-        }
-      </div>
+          @if (opened(); as resume) {
+            <app-resume-preview
+              [postingId]="resume.postingId"
+              [resumeId]="resume.id"
+              [highlights]="highlights()"
+              [picked]="picked()"
+              (pick)="choose($event)"
+            />
+          }
+        </section>
+      }
+
+      <section class="card" aria-labelledby="table-heading">
+        <h2 id="table-heading">Saved jobs, newest first</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Saved</th>
+              <th>Coverage</th>
+              <th>Job</th>
+              <th>Line</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.postingId) {
+              <tr [class.sel]="openedPosting()?.id === row.postingId">
+                <td>{{ row.createdAt | date: 'MMM d' }}</td>
+                <td class="num">
+                  @if (row.total !== null) {
+                    {{ row.total }}
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  <button type="button" class="link" (click)="open(row)">
+                    {{ row.title }}
+                    @if (row.company) {
+                      <span class="company">{{ row.company }}</span>
+                    }
+                  </button>
+                </td>
+                <td>{{ lineOf(row) }}</td>
+                <td>
+                  @if (confirming() === row.postingId) {
+                    <button type="button" class="btn danger small" [disabled]="deleting()" (click)="remove(row.postingId)">
+                      Delete this match
+                    </button>
+                    <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
+                  } @else {
+                    <button type="button" class="btn ghost small" (click)="confirming.set(row.postingId)">Delete</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
     }
   }
 </section>

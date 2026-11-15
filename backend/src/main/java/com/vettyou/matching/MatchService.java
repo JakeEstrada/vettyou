@@ -9,12 +9,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.vettyou.ai.OpenAiClient;
 import com.vettyou.evidence.StackDetector;
 
 @Service
 public class MatchService {
+
+	private static final Logger log = LoggerFactory.getLogger(MatchService.class);
 
 	private static final int CITES = 4;
 
@@ -38,15 +43,23 @@ public class MatchService {
 
 	/**
 	 * Judges every part against the person's lines with OpenAI, then adds lines that name a listed technology. With no
-	 * key it returns no judgments; parts are then judged by the rules on every read. Call outside a transaction.
-	 * {@code role} is the job title and employer as the posting states them, or empty.
+	 * key, or when the model cannot be reached, it returns no judgments; parts are then judged by the rules so a
+	 * resume can still be built. Call outside a transaction. {@code role} is the job title and employer as the posting
+	 * states them, or empty.
 	 */
 	public Judgments judge(UUID userId, String role, List<RequirementInput> requirements) {
 		EvidenceIndex index = EvidenceIndex.of(loader.load(userId));
 		if (!ai.enabled()) {
 			return new Judgments("rules", index.fingerprint(), Map.of());
 		}
-		Map<UUID, PartJudgment> judged = new LinkedHashMap<>(ai.judge(role, requirements, index));
+		Map<UUID, PartJudgment> judged;
+		try {
+			judged = new LinkedHashMap<>(ai.judge(role, requirements, index));
+		}
+		catch (OpenAiClient.AiException ex) {
+			log.warn("Evidence match fell back to the tech list: {}", ex.getMessage());
+			return new Judgments("rules", index.fingerprint(), Map.of());
+		}
 		for (RequirementInput requirement : requirements) {
 			for (PartInput part : requirement.parts()) {
 				PartJudgment judgment = judged.get(part.id());

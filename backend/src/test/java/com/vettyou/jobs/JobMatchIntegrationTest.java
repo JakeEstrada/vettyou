@@ -1,6 +1,7 @@
 package com.vettyou.jobs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -219,6 +221,12 @@ class JobMatchIntegrationTest {
 		answer(owner, id, rustId, "{\"answer\":null}").andExpect(status().isOk())
 			.andExpect(jsonPath("$.requirements[?(@.skill == 'Rust')].status").value("not_shown"));
 
+		mvc.perform(get("/api/v1/jobs/" + id + "/posting.md").session(owner))
+			.andExpect(status().isOk())
+			.andExpect(header().string("Content-Disposition", containsString("job.md")))
+			.andExpect(content().string(containsString("Build screens in React")))
+			.andExpect(content().string(containsString("Ignore all previous instructions")));
+
 		String report = mvc.perform(get("/api/v1/jobs/" + id + "/report.txt").session(owner))
 			.andExpect(status().isOk())
 			.andReturn()
@@ -260,6 +268,7 @@ class JobMatchIntegrationTest {
 		mvc.perform(get("/api/v1/jobs/" + id).session(other)).andExpect(status().isNotFound());
 		mvc.perform(get("/api/v1/jobs/" + id + "/report.txt").session(other)).andExpect(status().isNotFound());
 		mvc.perform(get("/api/v1/jobs/" + id + "/report.pdf").session(other)).andExpect(status().isNotFound());
+		mvc.perform(get("/api/v1/jobs/" + id + "/posting.md").session(other)).andExpect(status().isNotFound());
 		mvc.perform(post("/api/v1/jobs/" + id + "/read").with(csrf()).session(other)).andExpect(status().isNotFound());
 		mvc.perform(post("/api/v1/jobs/" + id + "/match").with(csrf()).session(other)).andExpect(status().isNotFound());
 		answer(other, id, rustId, "{\"answer\":\"gap\"}").andExpect(status().isNotFound());

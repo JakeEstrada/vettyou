@@ -4,12 +4,34 @@
   text-align: center;
 }
 
+.page {
+  max-width: 72rem;
+}
+
+.score-and-pdf {
+  display: grid;
+  grid-template-columns: minmax(16rem, 32rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin: var(--space-3) auto 0;
+}
+
 .score,
 .readiness {
   max-width: 32rem;
-  margin: var(--space-3) auto 0;
+  margin: 0;
   padding: var(--space-3);
   border: 1px solid var(--color-line);
+}
+
+.pdf-pane {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .score-and-pdf {
+    grid-template-columns: 1fr;
+  }
 }
 
 .score {

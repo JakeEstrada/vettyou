@@ -69,6 +69,16 @@ public class JobController {
 			.body(pdf);
 	}
 
+	@GetMapping(value = "/{id}/posting.md", produces = "text/markdown;charset=UTF-8")
+	public ResponseEntity<String> postingMarkdown(@AuthenticationPrincipal UserDetails principal,
+			@PathVariable UUID id) {
+		String body = jobs.postingMarkdown(currentUser.id(principal), id);
+		return ResponseEntity.ok()
+			.header(HttpHeaders.CONTENT_DISPOSITION,
+					ContentDisposition.attachment().filename("job.md").build().toString())
+			.body(body);
+	}
+
 	@PostMapping("/{id}/read")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	public JobPostingSummary reread(@AuthenticationPrincipal UserDetails principal, @PathVariable UUID id) {

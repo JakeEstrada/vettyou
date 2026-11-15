@@ -74,4 +74,23 @@ class AtsFirstTemplateTest {
 		assertThat(png).startsWith((byte) 0x89, (byte) 'P', (byte) 'N', (byte) 'G');
 	}
 
+	@Test
+	void marksSitOnTheScoredBulletOnTheFirstPagePng() {
+		ResumeDocument resume = document(
+				List.of("Built React screens backed by PostgreSQL", "Mentored two junior developers"));
+
+		List<AtsFirstTemplate.Mark> marks = template.marks(resume,
+				List.of("Built React screens backed by PostgreSQL", "A line that is not on the resume"));
+
+		assertThat(marks).hasSize(1);
+		assertThat(marks.get(0).text()).isEqualTo("Built React screens backed by PostgreSQL");
+		assertThat(marks.get(0).boxes()).isNotEmpty();
+		AtsFirstTemplate.Box box = marks.get(0).boxes().get(0);
+		assertThat(box.width()).isGreaterThan(80);
+		assertThat(box.height()).isGreaterThan(10);
+		assertThat(box.x()).isGreaterThan(50);
+		assertThat(box.y()).isGreaterThan(80);
+		assertThat(box.y() + box.height()).isLessThan(1100);
+	}
+
 }

@@ -140,6 +140,7 @@ Signed-in only. Another account's posting or requirement id returns `404 NOT_FOU
 | PUT | `/api/v1/jobs/{id}/requirements/{requirementId}/answer` | Body `{answer: "meets" \| "gap" \| null}`. `200` the updated posting. `gap` ("I don't have this") is allowed on any item. `meets` is allowed only when `canMarkMet` is true (items text cannot settle, such as years or a license); otherwise `422` on `answer`. `null` clears the answer. |
 | GET | `/api/v1/jobs/{id}/report.txt` | `200` `text/plain` report for sharing: score, each factor with its weight and value, both formulas, the crediting rules, every requirement with its status, weight, credit, strength, each part with its label, reason, and cited lines (and whether each line is confirmed), and the posting quote, then the posting text. `409` until the posting is `ready`. |
 | GET | `/api/v1/jobs/{id}/report.pdf` | `200` `application/pdf` (inline, `vettyou-job-match-report.pdf`) with the same lines. Characters Helvetica cannot draw print as `?`. `409` until `ready`. |
+| GET | `/api/v1/jobs/{id}/posting.md` | `200` `text/markdown` attachment `job.md` with the saved posting text. Available as soon as the paste is stored. `404` for another account. |
 | DELETE | `/api/v1/jobs/{id}/requirements/{requirementId}` | `200` the updated posting without that requirement ("not a real requirement"). |
 | DELETE | `/api/v1/jobs/{id}` | `204`. Removes the posting, its requirements, and its tailored resumes. |
 
@@ -203,7 +204,7 @@ Signed-in only. Another account's posting or resume id returns `404 NOT_FOUND`, 
 | GET | `/api/v1/jobs/{postingId}/resumes/{id}/resume.pdf` | `200` `application/pdf`, inline, `<Name>-resume.pdf` (`resume.pdf` without a name), `Cache-Control: private, max-age=3600`. The bytes match `pdfSha256`. |
 | GET | `/api/v1/jobs/{postingId}/resumes/{id}/preview.png` | `200` `image/png` of page 1 at 100 DPI, rendered from the same PDF. Same cache header. |
 
-A version is `{id, postingId, version, template: "ats-first", createdAt, postingTitle, postingCompany, stale, staleReasons, score, evidenceTotal, evidenceTotalIfConfirmed, requirements, readability, checks, lines, leftOff, toConfirm, skills, skillsLeftOff, suggestions, workOn, document, plainText, pages, pdfSha256}`.
+A version is `{id, postingId, version, template: "ats-first", createdAt, postingTitle, postingCompany, stale, staleReasons, score, evidenceTotal, evidenceTotalIfConfirmed, requirements, readability, checks, lines, leftOff, toConfirm, skills, skillsLeftOff, suggestions, workOn, document, plainText, pages, pdfSha256, highlights}`.
 
 - `score` and `requirements` use the job match shapes above, counting only what the resume shows. `evidenceTotal` is the match page's score when the version was built.
 - `checks` are the 8 read-back checks `{key, label, passed, detail}`: `text`, `name`, `email`, `phone`, `headings`, `order`, `pages`, `characters`. `readability` is the share passed.
@@ -213,6 +214,7 @@ A version is `{id, postingId, version, template: "ats-first", createdAt, posting
 - `suggestions` are `{kind: space \| too_long \| confirm \| skills \| readability, text, line, sourceKind, sourceId}`, changes to the user's own data that would let the next version show more.
 - `workOn` are `{requirement, part, group, status: not_shown \| changed \| gap \| unclear, reason}`, what the posting asks for that the resume does not claim.
 - `document` is what was drawn: `{name, contact, sections: [{heading, rows: [{label, text}], entries: [{title, dates, subtitle, bullets}]}]}`. `plainText` is the text read back out of the PDF.
+- `highlights` are the printed bullets that count toward the estimate, with boxes on the first-page PNG (`preview.png`, 850×1100 at 100 DPI, origin top-left): `{text, why, boxes: [{x, y, width, height}]}`. `why` names the posting parts that line shows. Empty when no scored line is on page 1.
 - `staleReasons` (plain sentences) are given when the posting was matched again, is being read again, failed, or when the profile, jobs, projects, schools, skills, or answers the version used changed.
 
 ### Applications

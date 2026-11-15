@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import com.vettyou.ai.OpenAiClient;
 import com.vettyou.matching.Judgments;
 import com.vettyou.matching.MatchService;
 import com.vettyou.matching.RequirementInput;
+import com.vettyou.resumes.TailoredResumeService;
 
 import jakarta.annotation.PreDestroy;
 
@@ -40,13 +42,16 @@ class JobReadWorker {
 
 	private final TransactionTemplate transactions;
 
+	private final ObjectProvider<TailoredResumeService> tailoredResumes;
+
 	JobReadWorker(JobPostingRepository postings, RequirementStore store, JobReader reader, MatchService matching,
-			TransactionTemplate transactions) {
+			TransactionTemplate transactions, ObjectProvider<TailoredResumeService> tailoredResumes) {
 		this.postings = postings;
 		this.store = store;
 		this.reader = reader;
 		this.matching = matching;
 		this.transactions = transactions;
+		this.tailoredResumes = tailoredResumes;
 	}
 
 	void submit(UUID postingId) {
@@ -78,6 +83,7 @@ class JobReadWorker {
 			});
 			Judgments judgments = matching.judge(posting.getUserId(), work.role(), work.inputs());
 			transactions.executeWithoutResult(status -> saveMatch(postingId, judgments));
+			buildResumeQuietly(posting.getUserId(), postingId);
 		}
 		catch (OpenAiClient.AiException ex) {
 			transactions.executeWithoutResult(status -> fail(postingId, ex.getMessage()));
@@ -112,6 +118,20 @@ class JobReadWorker {
 			posting.matched(judgments.matcher(), judgments.fingerprint());
 			postings.save(posting);
 		});
+	}
+
+	/** First tailored copy for this posting. A later rematch keeps the saved version; the person can rebuild. */
+	private void buildResumeQuietly(UUID userId, UUID postingId) {
+		TailoredResumeService resumes = tailoredResumes.getIfAvailable();
+		if (resumes == null) {
+			return;
+		}
+		try {
+			resumes.ensureBuilt(userId, postingId);
+		}
+		catch (RuntimeException ex) {
+			log.warn("Matched posting {} but could not build a resume: {}", postingId, ex.getMessage());
+		}
 	}
 
 	private void fail(UUID postingId, String message) {

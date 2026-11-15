@@ -25,7 +25,7 @@ vettyou:
     api-key: ${OPENAI_API_KEY:${AI_API_KEY:}}
     model: ${AI_MODEL:}
     base-url: https://api.openai.com/v1
-    timeout-seconds: 120
+    timeout-seconds: 300
   mail:
     encryption-key: ${MAIL_ENCRYPTION_KEY:}
 

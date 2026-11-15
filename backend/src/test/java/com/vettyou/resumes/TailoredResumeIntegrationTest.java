@@ -178,9 +178,13 @@ class TailoredResumeIntegrationTest {
 		String postingId = json.readTree(created.getResponse().getContentAsString()).get("id").asString();
 		assertThat(waitUntilDone(owner, postingId).get("status").asString()).isEqualTo("ready");
 		String resumes = "/api/v1/jobs/" + postingId + "/resumes";
+		JsonNode latest = waitUntilResume(owner, resumes);
+		assertThat(latest.get("version").asInt()).isEqualTo(1);
+		String resumeId = latest.get("id").asString();
+		String resume = resumes + "/" + resumeId;
 
-		MvcResult built = mvc.perform(post(resumes).with(csrf()).session(owner))
-			.andExpect(status().isCreated())
+		MvcResult built = mvc.perform(get(resume).session(owner))
+			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.version").value(1))
 			.andExpect(jsonPath("$.template").value("ats-first"))
 			.andExpect(jsonPath("$.stale").value(false))
@@ -201,13 +205,13 @@ class TailoredResumeIntegrationTest {
 			.andExpect(jsonPath("$.workOn[*].requirement", hasItem("Rust")))
 			.andExpect(jsonPath("$.skills[*].shown", hasItems("React", "PostgreSQL")))
 			.andExpect(jsonPath("$.plainText", containsString("Ada Lovelace")))
+			.andExpect(jsonPath("$.highlights[*].text", hasItems(REACT_LINE, MENTOR_LINE)))
+			.andExpect(jsonPath("$.highlights[0].boxes[0].width", notNullValue()))
 			.andExpect(jsonPath("$.plainText", containsString(REACT_LINE)))
 			.andExpect(jsonPath("$.plainText", not(containsString("Rust"))))
 			.andExpect(jsonPath("$.plainText", not(containsString("Ignore all previous instructions"))))
 			.andReturn();
 		JsonNode first = json.readTree(built.getResponse().getContentAsString());
-		String resumeId = first.get("id").asString();
-		String resume = resumes + "/" + resumeId;
 
 		mvc.perform(get(resumes).session(owner))
 			.andExpect(status().isOk())
@@ -294,6 +298,18 @@ class TailoredResumeIntegrationTest {
 
 	private static String sha256(byte[] content) throws Exception {
 		return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
+	}
+
+	private JsonNode waitUntilResume(MockHttpSession session, String resumes) throws Exception {
+		for (int attempt = 0; attempt < 200; attempt++) {
+			MvcResult result = mvc.perform(get(resumes).session(session)).andReturn();
+			JsonNode body = json.readTree(result.getResponse().getContentAsString());
+			if (body.isArray() && body.size() > 0) {
+				return body.get(0);
+			}
+			Thread.sleep(100);
+		}
+		throw new AssertionError("No tailored resume was built");
 	}
 
 	private JsonNode waitUntilDone(MockHttpSession session, String id) throws Exception {

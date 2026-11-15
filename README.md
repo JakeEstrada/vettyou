@@ -4,6 +4,8 @@
 
 Vettyou turns your real experience and project write-ups into a source-backed master resume, tailors it to each job posting without inventing anything, exports clean PDFs, and tracks every application from draft to offer.
 
+For a resume-oriented brief of the stack, architecture, and skills this repo demonstrates, see [`Vettyou.md`](Vettyou.md).
+
 > A visibly supported 72/100 with real evidence beats an opaque 96/100 built on fabricated keywords.
 
 ---
@@ -33,7 +35,7 @@ Vettyou turns your real experience and project write-ups into a source-backed ma
 | **Job Analyzer** | Paste a job posting, extract required vs preferred qualifications with quotes from the original text |
 | **Tailoring** | Build a job-specific resume from true bullets, with an explainable match score and two recommendation lists |
 | **Application tracker** | Track status, notes, the exact PDF sent, and the score at send time |
-| **Mailbox connect** | Optional IMAP login (Namecheap Private Email by default). Reading and status updates come later |
+| **Mailbox connect** | IMAP (Namecheap Private Email). Applied/rejected is saved only after you confirm a message |
 | **Insights** *(later)* | Outcome counts and recurring skill gaps, always with sample sizes |
 
 ## Core principles
@@ -54,29 +56,28 @@ Vettyou turns your real experience and project write-ups into a source-backed ma
 | Frontend | Angular (standalone components), TypeScript, Reactive Forms, Signals, RxJS, SCSS |
 | Backend | Java 21, Spring Boot (modular monolith), Spring Security, Spring Data JPA |
 | Database | PostgreSQL, Flyway migrations |
-| PDF | HTML/CSS templates rendered via Playwright for Java, verified with PDFBox |
-| AI | Provider-neutral adapter on the backend only |
-| Mail | Jakarta/Angus Mail over IMAP/TLS (connect now; reading later) |
-| Storage | S3-compatible object storage |
-| Testing | JUnit 5, Mockito, Testcontainers, Angular unit tests, E2E |
-| CI/CD | GitHub Actions, Docker |
-| Hosting | Render (API), Vercel (frontend) |
+| PDF | Apache PDFBox: import resume text and generate the ATS-first PDF (read back for scoring) |
+| AI | OpenAI Chat Completions (`gpt-5-mini`) via Spring `RestClient`; Java validates every quote |
+| Mail | Jakarta/Angus Mail over IMAP/TLS; status writes wait for user confirm |
+| Testing | JUnit 5, Mockito, Testcontainers PostgreSQL, Angular (Vitest) |
+| CI/CD | GitHub Actions, Docker Compose for local Postgres |
+| Hosting | Vercel (Angular at www.vettyou.com). Java API is local until Render is on |
 
 ## Architecture
 
 ```
-Angular SPA (Vercel)
-  Profile | Projects | Resume Studio | Job Analyzer | Applications | Mailbox | Insights
+Angular SPA (Vercel: www.vettyou.com)
+  Home | Resume | Jobs | Applications | Email | Scores
                               |
                           HTTPS / REST  (/api/v1)
                               |
-Spring Boot modular monolith (Render)
+Spring Boot modular monolith (local today)
   auth  profile  projects  evidence  templates  resumes  jobs
-  matching  applications  mail  insights  ai  worker  common
+  matching  applications  mail  ai  common
                               |
-            PostgreSQL  +  S3-compatible object storage
+                     PostgreSQL (Flyway)
                               |
-          External LLM API (server side)   Optional IMAP/TLS
+          OpenAI (server side)   Optional IMAP/TLS
 ```
 
 Request flow for anything AI-driven:
@@ -224,13 +225,13 @@ This repo is built to be driven by an AI coding agent (Cursor or Claude Code), o
 
 ## Roadmap
 
-- [ ] **M0** Repo skeleton, Spring Boot + Angular shells, Postgres, Flyway, auth scaffold, CI
-- [ ] **M1** Evidence library: profile, experience, README upload, claim review
-- [ ] **M2** Resume Studio: base resume, ATS-first + Signature templates, PDF export
-- [ ] **M3** Job analysis, tailoring, validator, explainable score
-- [ ] **M4** Application tracker with frozen sent versions
-- [ ] **M5** Private email sync over IMAP/TLS
-- [ ] **M6** Insights, polish, monitoring, data controls
+- [x] **M0** Repo skeleton, Spring Boot + Angular shells, Postgres, Flyway, auth scaffold, CI
+- [x] **M1** Evidence library: profile, experience, README upload, claim review *(in use)*
+- [x] **M2** Resume Studio: master resume, ATS-first PDF, import *(in use)*
+- [x] **M3** Job analysis, tailoring, explainable Vettyou estimate *(in use)*
+- [x] **M4** Application tracker *(in use)*
+- [x] **M5** Private email sync over IMAP/TLS with confirm-before-status *(in use locally)*
+- [ ] **M6** Insights, polish, hosted API, data controls
 
 Details and acceptance criteria live in `docs/PRODUCT_BLUEPRINT.md` section 17.
 
@@ -238,6 +239,7 @@ Details and acceptance criteria live in `docs/PRODUCT_BLUEPRINT.md` section 17.
 
 | Doc | Purpose |
 | --- | --- |
+| [`Vettyou.md`](Vettyou.md) | Resume brief: stack, skills, suggested bullets |
 | [`docs/PRODUCT_BLUEPRINT.md`](docs/PRODUCT_BLUEPRINT.md) | Full spec and source of truth |
 | [`docs/PROGRESS.md`](docs/PROGRESS.md) | Running milestone log |
 | [`docs/API_CONTRACTS.md`](docs/API_CONTRACTS.md) | API conventions |
@@ -246,7 +248,7 @@ Details and acceptance criteria live in `docs/PRODUCT_BLUEPRINT.md` section 17.
 
 ## Status
 
-Milestone 0 is in place: API, dark site, accounts, and CI. Next is the profile and evidence library.
+Local product is past M0: evidence library, resume PDF, job match, tailored resume, application tracker, and confirmed IMAP mail. Frontend is on Vercel; the API is still local. Details that are safe to put on a resume are in [`Vettyou.md`](Vettyou.md).
 
 ---
 

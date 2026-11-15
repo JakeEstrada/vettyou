@@ -59,6 +59,11 @@
         I don't have this <span class="sr-only">: {{ requirement.skill }}</span>
       </button>
     }
+    @if (canShow()) {
+      <button type="button" class="link" (click)="show.emit()">
+        Show on resume <span class="sr-only">: {{ requirement.skill }}</span>
+      </button>
+    }
     <button type="button" class="link" (click)="removed.emit()">
       Not a real requirement <span class="sr-only">: {{ requirement.skill }}</span>
     </button>

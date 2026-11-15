@@ -136,6 +136,23 @@ public class AtsFirstTemplate {
 		}
 	}
 
+	/**
+	 * Boxes on the first-page PNG for printed bullets. Coordinates are pixels at {@link #PREVIEW_DPI}, origin top-left,
+	 * matching {@link #preview(byte[])}. Empty when a line is not on page 1.
+	 */
+	public List<Mark> marks(ResumeDocument document, List<String> lines) {
+		Fonts fonts = new Fonts();
+		Layout layout = layout(document, fonts);
+		List<Mark> marks = new ArrayList<>();
+		for (String line : lines) {
+			List<Box> boxes = firstPageBoxes(layout, fonts, line);
+			if (!boxes.isEmpty()) {
+				marks.add(new Mark(line, boxes));
+			}
+		}
+		return List.copyOf(marks);
+	}
+
 	/** The first page as a PNG, drawn from the same PDF. */
 	public byte[] preview(byte[] pdf) {
 		try (PDDocument document = Loader.loadPDF(pdf); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -321,6 +338,62 @@ public class AtsFirstTemplate {
 				return false;
 			}
 		});
+	}
+
+	private List<Box> firstPageBoxes(Layout layout, Fonts fonts, String line) {
+		Layout scratch = new Layout();
+		String print = printable(line, scratch, fonts);
+		if (print.isEmpty()) {
+			return List.of();
+		}
+		List<String> pieces = wrap(print, fonts.regular, BODY_SIZE, WIDTH - TEXT_X);
+		List<Op> body = new ArrayList<>();
+		for (Op op : layout.ops) {
+			if (op.page() == 0 && op.size() == BODY_SIZE && !"\u2022".equals(op.text())) {
+				body.add(op);
+			}
+		}
+		for (int i = 0; i <= body.size() - pieces.size(); i++) {
+			boolean match = true;
+			for (int j = 0; j < pieces.size(); j++) {
+				if (!pieces.get(j).equals(body.get(i + j).text())) {
+					match = false;
+					break;
+				}
+			}
+			if (match) {
+				List<Box> boxes = new ArrayList<>();
+				for (int j = 0; j < pieces.size(); j++) {
+					boxes.add(box(body.get(i + j)));
+				}
+				return List.copyOf(boxes);
+			}
+		}
+		return List.of();
+	}
+
+	private static Box box(Op op) {
+		float scale = PREVIEW_DPI / 72f;
+		float width;
+		try {
+			width = op.font().getStringWidth(op.text()) / 1000 * op.size();
+		}
+		catch (IOException ex) {
+			throw new UncheckedIOException(ex);
+		}
+		float height = op.size() * 1.28f;
+		float pad = 2.5f * scale;
+		float x = op.x() * scale - pad;
+		float y = (PAGE.getHeight() - (op.y() + 0.82f * op.size())) * scale - pad;
+		return new Box(Math.max(0, x), Math.max(0, y), width * scale + 2 * pad, height * scale + 2 * pad);
+	}
+
+	/** A scored bullet and where it sits on the first-page PNG. */
+	public record Mark(String text, List<Box> boxes) {
+	}
+
+	/** Pixel box on the preview PNG, origin at the top left. */
+	public record Box(float x, float y, float width, float height) {
 	}
 
 	private record Op(int page, float x, float y, PDType1Font font, float size, String text) {

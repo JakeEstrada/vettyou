@@ -29,6 +29,72 @@ Update at the end of every working session. Newest entry on top.
 
 ## Session log
 
+### 2026-11-14: ATS global dashboard, job.md, auto-built resume
+
+- **Done:** Signed-in Home is ATS global (scatter of date vs Vettyou estimate, dashed 78 apply line, table newest first, click-through to matched/partial/missing, posting text, tailored resume). Nav Scores renamed to ATS global. Each matched posting gets a tailored resume if none exists. Saved posting downloads as `job.md`. Score stays a Vettyou estimate.
+- **Files changed:** `JobController` / `JobService` `GET /jobs/{id}/posting.md`, `JobReadWorker` + `TailoredResumeService.ensureBuilt`, `scores-page.*`, `home-page.*`, `shell.html`, `job-match-page.*`, `job-posting-api.ts`, `JobMatchIntegrationTest`, `TailoredResumeIntegrationTest`, `docs/API_CONTRACTS.md`.
+- **Decisions:** 78 is a visual apply line only, not an employer cutoff. Rematch does not add resume versions. Guest landing is unchanged.
+- **Tests run / results:**
+  - `JobMatchIntegrationTest`, `TailoredResumeIntegrationTest`: passed (exit 0).
+  - Frontend `home-page.spec.ts`, `scores-page.spec.ts`, `job-match-page.spec.ts`: 8 passed.
+  - **Live:** `http://127.0.0.1:4200/` signed in as the test account shows ATS global (plot with 78 line, Brightline 83 / Crossing Hurdles 86 / Hoag 2). Opening Brightline showed matched / partial / missing, `Download job.md`, and the tailored resume. Score labeled Vettyou estimate.
+- **Next step:** Sign in at `http://127.0.0.1:4200`. Existing postings without a resume stay “No estimate yet” until you rematch or build; new matches get a resume automatically.
+
+### 2026-11-12: Resume brief in Vettyou.md
+
+- **Done:** Added `Vettyou.md` so another model can write a project section and skills from facts only (stack versions, what shipped, what not to claim). Pointed `README.md` at it and corrected stale README lines (PDFBox not Playwright, Vercel UI / local API, M1–M5 in use).
+- **Files changed:** `Vettyou.md`, `README.md`.
+- **Decisions:** Do not list Kafka/Redis/K8s/GraphQL. Do not call the score an employer ATS score. Do not claim the Java API is hosted.
+- **Tests run / results:** Docs only; not executed.
+- **Next step:** Feed `Vettyou.md` to a resume pass. Host the API when ready.
+
+### 2026-11-09: Tailored resume blocked when evidence match could not reach OpenAI
+
+- **Done:** Opening a tailored resume needs the posting `ready`. A successful job read was then failing the whole posting when the evidence-match OpenAI call died (`ResourceAccessException`, two calls at once). Matching now retries once, runs one OpenAI call at a time over HTTP/1.1, waits up to 300s, and falls back to the tech-list matcher so a resume can still be built. The score is still a Vettyou estimate.
+- **Files changed:** `OpenAiClient` (HTTP/1.1, lock, retry, timeout copy), `application.yml` timeout 300, `MatchService.judge` rules fallback, `OpenAiClientTest`, `MatchServiceFallbackTest`.
+- **Decisions:** Do not fail a posting that already has requirements just because matching timed out. Matcher name becomes `rules` when that happens.
+- **Tests run / results:** `OpenAiClientTest`, `MatchServiceFallbackTest` passed (exit 0). API restarted (`Started VettyouApplication`).
+- **Next step:** Sign in at `http://127.0.0.1:4200`, open the failed posting, click **Try again**, wait, then **Build the resume**.
+
+### 2026-11-08: Signed-out Home is a product landing
+
+- **Done:** Visitors who are not signed in (or cannot reach the API) see a homepage: petrol/copper Signature-style demo, a looping match animation, and Create account / Log in. The animation shows a posting lined up with your words, copper marks on backed lines, unmatched clearance, and a Vettyou estimate. It does not invent a real person’s credentials. Reduced motion shows the last frame. Signed-in Home is unchanged.
+- **Files changed:** `home-page.html`, `home-page.scss`, `home-page.ts` (401 and unreachable API both open the landing), `home-page.spec.ts`.
+- **Decisions:** Demo copy is labeled “Your name” / “the work you described.” Secret clearance stays unmatched on purpose. Hover pauses the loop.
+- **Tests run / results:**
+  - `home-page.spec.ts` 2 passed (signed-out landing + signed-in dashboard).
+  - **Live:** `http://127.0.0.1:4200/` signed out showed the headline, CTAs, copper marks, 67/100 Vettyou estimate. Create account opened `/register`. Login page still works. Narrow viewport stacked the demo.
+- **Next step:** Use `http://127.0.0.1:4200` signed out to see it. www.vettyou.com will match after a frontend deploy.
+
+### 2026-11-08: www.vettyou.com Home is the UI only
+
+- **Done:** Opening www.vettyou.com showed “Something went wrong. Try again.” because `/api/v1/profile` is served as `index.html` (no Java host). Local `:4200` and `:8080` were down. Restarted them. Unreachable API copy is now “Could not reach the Vettyou API.”
+- **Files changed:** `session.ts` `apiUnreachable` / `messageOf`, `session.spec.ts`.
+- **Decisions:** Production stays Angular-only until Render. Use `http://127.0.0.1:4200` for job paste and login.
+- **Tests run / results:** `session.spec.ts` 1 passed. Local `/api/v1/health` and `http://127.0.0.1:4200` both 200.
+- **Next step:** Sign in at `http://127.0.0.1:4200`, not www.vettyou.com. Try again on the failed posting.
+
+### 2026-11-08: Job paste “cannot connect to the AI” was a 120s timeout
+
+- **Done:** The OpenAI key is loaded. Reading a posting with `gpt-5-mini` often takes 80–104s, then evidence matching needs another call and was hitting the 120s read timeout (`ResourceAccessException` → “The AI service could not be reached.”). Timeout is now 240s. Timeouts say “The AI took too long to answer. Try again.” instead of a missing-key or unreachable message. Busy copy says it can take a couple of minutes.
+- **Files changed:** `application.yml` `vettyou.ai.timeout-seconds`, `OpenAiClient` (timeout default, `reachError`), `OpenAiClientTest`, `job-match-page.html`.
+- **Decisions:** Keep OpenAI as the reader/matcher. Do not fall back to rules when the key is present. Restarting the API dropped in-memory sessions.
+- **Tests run / results:**
+  - `OpenAiClientTest`: passed (exit 0).
+  - API restarted and `Started VettyouApplication`. Live job paste not re-run this step (each read+match can take a few minutes).
+- **Next step:** Sign in again, open the failed posting, click **Try again**, and wait. Paste one posting at a time.
+
+### 2026-11-08: Score shows the resume PDF with the lines it is reading marked
+
+- **Done:** Opening a Vettyou estimate now shows page 1 of the saved PDF next to the number. Copper marks sit on the printed bullets that count. Select a mark to see which posting item that line shows. Match pages without a tailored resume still say to build one.
+- **Files changed:** `AtsFirstTemplate.marks`, `ResumeHighlight` / `HighlightBox`, `TailoredResumeResponse.highlights`, `resume-preview.*`, job match / tailored resume / scores pages, `docs/API_CONTRACTS.md`.
+- **Decisions:** Marks are computed from the same layout as the PDF, overlaid on `preview.png` (not a second HTML resume). The number stays a Vettyou estimate, never an employer ATS score. No new migration; boxes are not stored.
+- **Tests run / results:**
+  - `AtsFirstTemplateTest`, `TailoredResumeIntegrationTest`: passed (exit 0).
+  - Job match, tailored resume, and scores unit tests: 10 passed.
+  - **Live:** Test account Scores → Brightline 83/100 showed the PDF with copper marks on scored bullets. Clicking the PostgreSQL line selected it. API restart signed everyone out.
+- **Next step:** Host Spring Boot + Postgres (Render). Resume Render Postgres at 1 GB if that was paused.
+
 ### 2026-11-08: Replace Marathon GitHub repo with Vettyou
 
 - **Done:** GitHub `JakeEstrada/vettyou` `main` now holds this Angular + Spring Boot project. Marathon countdown files are gone from the current tree. Personal files (resume PDF, job history JSON, mailbox `.env`) stay local.

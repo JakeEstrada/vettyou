@@ -42,6 +42,11 @@ export class RequirementItem {
 
   readonly removed = output<void>();
 
+  /** When true, a control marks this item's lines on the resume PDF. */
+  readonly canShow = input(false);
+
+  readonly show = output<void>();
+
   readonly statusLabels = STATUS_LABELS;
 
   readonly partLabels = PART_LABELS;

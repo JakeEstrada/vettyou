@@ -93,39 +93,57 @@
         </div>
       }
 
-      <section class="score" aria-labelledby="score-heading">
-        <h2 id="score-heading" class="sr-only">Vettyou estimate for this resume</h2>
-        @if (resume.score.total !== null) {
-          <p class="total">
-            <span class="number">{{ resume.score.total }}</span><span class="out-of">/100</span>
-          </p>
-        } @else {
-          <p class="total"><span class="out-of">Nothing can be scored yet</span></p>
-        }
-        <p class="label">{{ resume.score.label }} for this resume</p>
-        <p class="hint">{{ resume.score.note }}</p>
-        @if (resume.evidenceTotal !== null) {
-          <p class="compare">
-            All your saved evidence scored {{ resume.evidenceTotal }}/100 when this version was built. A resume only
-            counts what it shows, and readability only counts on a resume.
-          </p>
-        }
-        <dl class="factors">
-          @for (factor of resume.score.factors; track factor.key) {
-            <div [class.left-out]="factor.value === null">
-              <dt>
-                {{ factor.label }} <span class="weight">{{ weight(factor) }}</span>
-              </dt>
-              <dd>
-                <span class="bar" aria-hidden="true"><span [style.width.%]="(factor.value ?? 0) * 100"></span></span>
-                {{ percent(factor.value) }} · {{ points(factor) }}
-              </dd>
-              <dd class="explain">{{ factor.how }}</dd>
-            </div>
+      <div class="score-and-pdf">
+        <section class="score" aria-labelledby="score-heading">
+          <h2 id="score-heading" class="sr-only">Vettyou estimate for this resume</h2>
+          @if (resume.score.total !== null) {
+            <p class="total">
+              <span class="number">{{ resume.score.total }}</span><span class="out-of">/100</span>
+            </p>
+          } @else {
+            <p class="total"><span class="out-of">Nothing can be scored yet</span></p>
           }
-        </dl>
-        <p class="formula"><span>How it adds up:</span> {{ resume.score.formula }}</p>
-      </section>
+          <p class="label">{{ resume.score.label }} for this resume</p>
+          <p class="hint">{{ resume.score.note }}</p>
+          @if (resume.evidenceTotal !== null) {
+            <p class="compare">
+              All your saved evidence scored {{ resume.evidenceTotal }}/100 when this version was built. A resume only
+              counts what it shows, and readability only counts on a resume.
+            </p>
+          }
+          <dl class="factors">
+            @for (factor of resume.score.factors; track factor.key) {
+              <div [class.left-out]="factor.value === null">
+                <dt>
+                  {{ factor.label }} <span class="weight">{{ weight(factor) }}</span>
+                </dt>
+                <dd>
+                  <span class="bar" aria-hidden="true"><span [style.width.%]="(factor.value ?? 0) * 100"></span></span>
+                  {{ percent(factor.value) }} · {{ points(factor) }}
+                </dd>
+                <dd class="explain">{{ factor.how }}</dd>
+              </div>
+            }
+          </dl>
+          <p class="formula"><span>How it adds up:</span> {{ resume.score.formula }}</p>
+        </section>
+        <aside class="pdf-pane" aria-label="Resume page with the lines this estimate is reading">
+          <app-resume-preview
+            [postingId]="resume.postingId"
+            [resumeId]="resume.id"
+            [highlights]="resume.highlights"
+            [picked]="picked()"
+            (pick)="choose($event)"
+          />
+          <p class="hint">
+            @if (resume.pages === 1) {
+              It fits on one page.
+            } @else {
+              It runs to {{ resume.pages }} pages.
+            }
+          </p>
+        </aside>
+      </div>
 
       <section class="section" aria-labelledby="checks-heading">
         <h2 id="checks-heading">
@@ -145,29 +163,6 @@
             </li>
           }
         </ul>
-      </section>
-
-      <section class="section" aria-labelledby="preview-heading">
-        <h2 id="preview-heading">Preview</h2>
-        <figure class="preview">
-          <a [href]="pdfUrl()" target="_blank" rel="noopener">
-            <img
-              [src]="previewUrl()"
-              width="850"
-              height="1100"
-              alt="Page 1 of the resume. Its text is listed below under What an applicant tracking system reads."
-            />
-          </a>
-          <figcaption class="hint">
-            Page 1 as the PDF draws it.
-            @if (resume.pages === 1) {
-              It fits on one page.
-            } @else {
-              It runs to {{ resume.pages }} pages.
-            }
-            Select it to open the PDF in a new tab.
-          </figcaption>
-        </figure>
       </section>
 
       <section class="section" aria-labelledby="on-heading">

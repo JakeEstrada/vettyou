@@ -115,6 +115,10 @@ export function reportUrl(id: string, format: 'txt' | 'pdf'): string {
   return `/api/v1/jobs/${id}/report.${format}`;
 }
 
+export function postingMarkdownUrl(id: string): string {
+  return `/api/v1/jobs/${id}/posting.md`;
+}
+
 @Injectable({ providedIn: 'root' })
 export class JobPostingApi {
   private readonly http = inject(HttpClient);

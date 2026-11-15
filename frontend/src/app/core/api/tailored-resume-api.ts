@@ -71,6 +71,26 @@ export interface ResumeDocument {
   }[];
 }
 
+/** Pixel box on the first-page PNG preview, origin at the top left. */
+export interface HighlightBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** A printed bullet that counts toward the estimate, and where it sits on the PDF page. */
+export interface ResumeHighlight {
+  text: string;
+  why: string;
+  boxes: HighlightBox[];
+}
+
+/** Native size of `preview.png` (letter at 100 DPI). */
+export const PREVIEW_WIDTH = 850;
+
+export const PREVIEW_HEIGHT = 1100;
+
 export interface TailoredResumeSummary {
   id: string;
   version: number;
@@ -109,6 +129,8 @@ export interface TailoredResume {
   plainText: string;
   pages: number;
   pdfSha256: string;
+  /** Printed bullets that count toward the estimate, with boxes on `preview.png`. */
+  highlights: ResumeHighlight[];
 }
 
 export function resumeFileUrl(postingId: string, id: string, file: 'resume.pdf' | 'preview.png'): string {

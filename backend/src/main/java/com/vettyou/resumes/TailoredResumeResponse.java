@@ -46,5 +46,6 @@ public record TailoredResumeResponse(
 		ResumeDocument document,
 		String plainText,
 		int pages,
-		String pdfSha256) {
+		String pdfSha256,
+		List<ResumeHighlight> highlights) {
 }

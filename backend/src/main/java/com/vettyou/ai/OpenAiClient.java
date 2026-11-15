@@ -2,6 +2,7 @@ package com.vettyou.ai;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,8 @@ import tools.jackson.databind.node.ObjectNode;
 
 /**
  * One structured-output call to OpenAI Chat Completions (ADR 0003). Returns the model's JSON; callers must validate
- * it before saving anything.
+ * it before saving anything. Calls run one at a time: two overlapping HTTP/2 streams on the same connection were
+ * dying together.
  */
 @Component
 public class OpenAiClient {
@@ -36,14 +38,18 @@ public class OpenAiClient {
 
 	private final JsonMapper json;
 
+	private final Object gate = new Object();
+
 	public OpenAiClient(@Value("${vettyou.ai.api-key:}") String apiKey, @Value("${vettyou.ai.model:}") String model,
 			@Value("${vettyou.ai.base-url:https://api.openai.com/v1}") String baseUrl,
-			@Value("${vettyou.ai.timeout-seconds:120}") int timeoutSeconds, JsonMapper json) {
+			@Value("${vettyou.ai.timeout-seconds:300}") int timeoutSeconds, JsonMapper json) {
 		this.apiKey = apiKey == null ? "" : apiKey.strip();
 		this.model = model == null ? "" : model.strip();
 		this.json = json;
-		JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(
-				HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build());
+		JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder()
+			.version(HttpClient.Version.HTTP_1_1)
+			.connectTimeout(Duration.ofSeconds(10))
+			.build());
 		factory.setReadTimeout(Duration.ofSeconds(timeoutSeconds));
 		this.http = RestClient.builder().baseUrl(baseUrl).requestFactory(factory).build();
 	}
@@ -73,24 +79,10 @@ public class OpenAiClient {
 		jsonSchema.set("schema", schema);
 
 		long started = System.nanoTime();
+		String payload = json.writeValueAsString(body);
 		String response;
-		try {
-			response = http.post()
-				.uri("/chat/completions")
-				.header("Authorization", "Bearer " + apiKey)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(json.writeValueAsString(body))
-				.retrieve()
-				.body(String.class);
-		}
-		catch (RestClientResponseException ex) {
-			log.warn("OpenAI call failed status={} model={}", ex.getStatusCode().value(), model);
-			throw new AiException(ex.getStatusCode().value() == 429 ? "The AI service is busy or out of credit. Try again later."
-					: "The AI service answered with an error (" + ex.getStatusCode().value() + ").");
-		}
-		catch (RestClientException ex) {
-			log.warn("OpenAI call could not complete model={} error={}", model, ex.getClass().getSimpleName());
-			throw new AiException("The AI service could not be reached.");
+		synchronized (gate) {
+			response = exchange(payload, true);
 		}
 		log.info("OpenAI call done model={} ms={}", model, (System.nanoTime() - started) / 1_000_000);
 
@@ -108,6 +100,53 @@ public class OpenAiClient {
 		catch (JacksonException ex) {
 			throw new AiException("The AI service returned something that is not valid JSON.");
 		}
+	}
+
+	private String exchange(String payload, boolean retry) {
+		try {
+			return http.post()
+				.uri("/chat/completions")
+				.header("Authorization", "Bearer " + apiKey)
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(payload)
+				.retrieve()
+				.body(String.class);
+		}
+		catch (RestClientResponseException ex) {
+			log.warn("OpenAI call failed status={} model={}", ex.getStatusCode().value(), model);
+			throw new AiException(ex.getStatusCode().value() == 429 ? "The AI service is busy or out of credit. Try again later."
+					: "The AI service answered with an error (" + ex.getStatusCode().value() + ").");
+		}
+		catch (RestClientException ex) {
+			log.warn("OpenAI call could not complete model={} retry={} error={}", model, retry, root(ex));
+			if (retry) {
+				return exchange(payload, false);
+			}
+			throw new AiException(reachError(ex));
+		}
+	}
+
+	/** Timeout vs a dead connection. Both arrive as {@link RestClientException}. */
+	static String reachError(Throwable error) {
+		for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+			if (cause instanceof java.net.http.HttpTimeoutException
+					|| cause instanceof java.net.SocketTimeoutException) {
+				return "The AI took too long to answer. Try again.";
+			}
+			String text = cause.getMessage();
+			if (text != null && text.toLowerCase(Locale.ROOT).contains("timed out")) {
+				return "The AI took too long to answer. Try again.";
+			}
+		}
+		return "The AI service could not be reached.";
+	}
+
+	private static String root(Throwable error) {
+		Throwable last = error;
+		for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+			last = cause;
+		}
+		return last.getClass().getSimpleName();
 	}
 
 	public static class AiException extends RuntimeException {
