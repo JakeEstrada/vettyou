@@ -172,8 +172,15 @@ export class ScoresPage {
       )
       .subscribe({
         next: (rows) => {
-          this.rows.set(rows.sort((a, b) => b.when.localeCompare(a.when)));
+          const sorted = rows.sort((a, b) => b.when.localeCompare(a.when));
+          this.rows.set(sorted);
           this.loading.set(false);
+          const ready = sorted.find((row) => row.resumeId);
+          if (ready) {
+            this.open(ready);
+          } else if (sorted.length > 0) {
+            this.open(sorted[0]);
+          }
         },
         error: (error: unknown) => {
           this.loading.set(false);

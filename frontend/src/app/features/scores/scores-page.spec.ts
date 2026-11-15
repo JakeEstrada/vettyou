@@ -102,6 +102,54 @@ function posting(overrides: Partial<JobPosting> = {}): JobPosting {
   };
 }
 
+function resume(): TailoredResume {
+  return {
+    id: 'r1',
+    postingId: 'jp1',
+    version: 5,
+    template: 'ats-first',
+    createdAt: '2026-11-07T00:00:00Z',
+    postingTitle: 'Engineer',
+    postingCompany: 'Acme',
+    stale: false,
+    staleReasons: [],
+    score: { total: 83, note: 'Not an employer score.' },
+    suggestions: [{ kind: 'skills', text: 'Keep React on the project page.', line: '', sourceKind: '', sourceId: null }],
+    workOn: [],
+    checks: [],
+    lines: [
+      {
+        kind: 'job',
+        sourceId: 'j1',
+        label: 'Engineer',
+        text: 'Built React screens',
+        gain: 0.4,
+        backs: [{ requirement: 'React', part: 'React', group: 'required', support: 'direct' }],
+        reason: '',
+      },
+    ],
+    highlights: [
+      {
+        text: 'Built React screens',
+        why: 'React — React',
+        boxes: [{ x: 80, y: 400, width: 400, height: 18 }],
+      },
+    ],
+    document: {
+      name: 'Ada',
+      contact: [],
+      sections: [
+        { heading: 'Skills', rows: [], entries: [] },
+        {
+          heading: 'Experience',
+          rows: [],
+          entries: [{ title: 'Engineer', dates: '2024', subtitle: 'Acme', bullets: ['Built React screens'] }],
+        },
+      ],
+    },
+  } as unknown as TailoredResume;
+}
+
 describe('ScoresPage', () => {
   it('lists the latest estimate on ATS global and deletes the match', async () => {
     await TestBed.configureTestingModule({
@@ -117,6 +165,8 @@ describe('ScoresPage', () => {
     http.expectOne('/api/v1/jobs/jp1/resumes').flush([
       { id: 'r1', version: 5, createdAt: '2026-11-07T00:00:00Z', total: 83 },
     ]);
+    http.expectOne('/api/v1/jobs/jp1').flush(posting());
+    http.expectOne('/api/v1/jobs/jp1/resumes/r1').flush(resume());
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -149,55 +199,8 @@ describe('ScoresPage', () => {
     http.expectOne('/api/v1/jobs/jp1/resumes').flush([
       { id: 'r1', version: 5, createdAt: '2026-11-07T00:00:00Z', total: 83 },
     ]);
-    await fixture.whenStable();
-
-    fixture.componentInstance.open(fixture.componentInstance.rows()[0]);
     http.expectOne('/api/v1/jobs/jp1').flush(posting());
-    http.expectOne('/api/v1/jobs/jp1/resumes/r1').flush({
-      id: 'r1',
-      postingId: 'jp1',
-      version: 5,
-      template: 'ats-first',
-      createdAt: '2026-11-07T00:00:00Z',
-      postingTitle: 'Engineer',
-      postingCompany: 'Acme',
-      stale: false,
-      staleReasons: [],
-      score: { total: 83, note: 'Not an employer score.' },
-      suggestions: [{ kind: 'skills', text: 'Keep React on the project page.', line: '', sourceKind: '', sourceId: null }],
-      workOn: [],
-      checks: [],
-      lines: [
-        {
-          kind: 'job',
-          sourceId: 'j1',
-          label: 'Engineer',
-          text: 'Built React screens',
-          gain: 0.4,
-          backs: [{ requirement: 'React', part: 'React', group: 'required', support: 'direct' }],
-          reason: '',
-        },
-      ],
-      highlights: [
-        {
-          text: 'Built React screens',
-          why: 'React — React',
-          boxes: [{ x: 80, y: 400, width: 400, height: 18 }],
-        },
-      ],
-      document: {
-        name: 'Ada',
-        contact: [],
-        sections: [
-          { heading: 'Skills', rows: [], entries: [] },
-          {
-            heading: 'Experience',
-            rows: [],
-            entries: [{ title: 'Engineer', dates: '2024', subtitle: 'Acme', bullets: ['Built React screens'] }],
-          },
-        ],
-      },
-    } as unknown as TailoredResume);
+    http.expectOne('/api/v1/jobs/jp1/resumes/r1').flush(resume());
     await fixture.whenStable();
     fixture.detectChanges();
 

@@ -30,6 +30,72 @@
   font-size: 0.92rem;
 }
 
+.board {
+  display: grid;
+  grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  margin: 0 0 0.85rem;
+}
+
+.sheet {
+  position: sticky;
+  top: 0.75rem;
+}
+
+.feed {
+  min-width: 0;
+}
+
+.job {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 1rem;
+  align-items: start;
+  background: #101218;
+  border: 1px solid var(--color-line);
+  padding: 0.85rem 1rem 0.7rem;
+  margin: 0 0 0.65rem;
+}
+
+.job.sel {
+  box-shadow: inset 2px 0 0 var(--color-copper);
+}
+
+.score-num {
+  margin: 0;
+  text-align: right;
+  font-size: 1.7rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--color-muted);
+}
+
+.score-num span {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.score-num .estimate,
+.score-num .line {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.score-num[data-tone='over'],
+.score-num[data-tone='watch'] {
+  color: #b7e0d0;
+}
+
+.score-num[data-tone='under'] {
+  color: #f0b2a8;
+}
+
 .card {
   background: #101218;
   border: 1px solid var(--color-line);
@@ -139,10 +205,7 @@ circle.current {
 }
 
 .detail {
-  display: grid;
-  grid-template-columns: minmax(18rem, 1fr) minmax(0, 1.05fr);
-  gap: 1.25rem;
-  align-items: start;
+  display: block;
 }
 
 .detail h2 {
@@ -325,8 +388,19 @@ button.link:hover {
 @media (max-width: 900px) {
   .top,
   .detail,
-  .cols {
+  .cols,
+  .board,
+  .job {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .sheet {
+    position: static;
+    order: 2;
+  }
+
+  .score-num {
+    text-align: left;
   }
 }

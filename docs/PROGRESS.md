@@ -29,6 +29,14 @@ Update at the end of every working session. Newest entry on top.
 
 ## Session log
 
+### 2026-11-15: Signed-in Home job board
+
+- **Done:** Signed-in Home keeps the side rail. The newest tailored resume sits on the left. Saved jobs stack on the right with the Vettyou estimate on each row. Selecting a job swaps the resume. The date plot stays underneath.
+- **Files changed:** `scores-page.html`, `scores-page.scss`, `scores-page.ts`, `scores-page.spec.ts`.
+- **Decisions:** The resume shown is the one already built from the user's evidence. Nothing is invented. The number stays a Vettyou estimate.
+- **Tests run / results:** `ng test` for `scores-page.spec.ts` and `home-page.spec.ts`: 4 passed. Vitest worker shutdown printed `kill EACCES` in the sandbox after the tests passed.
+- **Next step:** Push `frontend/vercel.json` so www.vettyou.com proxies `/api` to Render. Registration still returns Vercel's 405 until then.
+
 ### 2026-11-14: Docker image for the Render API
 
 - **Done:** Added `backend/Dockerfile` so Render can build the Java API. The server listens on `PORT` when Render sets it, otherwise 8080.

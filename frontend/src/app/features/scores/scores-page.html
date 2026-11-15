@@ -3,7 +3,8 @@
     <div>
       <h1 id="scores-heading">ATS global</h1>
       <p class="lede">
-        Newest first. The dashed line is {{ applyLine }}, your apply line. The number is a Vettyou estimate.
+        Newest first. The resume on the left is the one already built for the selected job. Each number is a Vettyou
+        estimate. The dashed line is {{ applyLine }}.
       </p>
     </div>
     <a class="btn ghost" routerLink="/jobs">Match a posting</a>
@@ -19,6 +20,76 @@
     @if (rows().length === 0) {
       <p class="lede">No matches yet.</p>
     } @else {
+      <div class="board">
+        <section class="card sheet" aria-labelledby="resume-heading">
+          <h2 id="resume-heading">Tailored resume</h2>
+          @if (opening()) {
+            <p role="status">Opening…</p>
+          }
+          @if (opened(); as resume) {
+            <p class="meta">
+              {{ openedPosting()?.title || resume.postingTitle || 'Job posting' }}
+              @if (resume.version) {
+                · version {{ resume.version }}
+              }
+            </p>
+            <app-resume-preview
+              [postingId]="resume.postingId"
+              [resumeId]="resume.id"
+              [highlights]="highlights()"
+              [picked]="picked()"
+              (pick)="choose($event)"
+            />
+          } @else if (!opening()) {
+            <p class="hint">Select a job. The resume built from your evidence shows here.</p>
+          }
+        </section>
+
+        <section class="feed" aria-labelledby="jobs-heading">
+          <h2 id="jobs-heading" class="sr-only">Saved jobs</h2>
+          @for (row of rows(); track row.postingId) {
+            <article class="job" [class.sel]="openedPosting()?.id === row.postingId" [attr.data-tone]="toneOf(row)">
+              <div>
+                <button type="button" class="link" (click)="open(row)">
+                  {{ row.title || 'Job posting' }}
+                </button>
+                <p class="meta">
+                  @if (row.company) {
+                    {{ row.company }} ·
+                  }
+                  saved {{ row.createdAt | date: 'MMM d, y' }}
+                </p>
+                <p class="links">
+                  <a [routerLink]="['/jobs', row.postingId]">Open the match</a>
+                  <a [routerLink]="['/jobs', row.postingId, 'resume']">Tailored resume</a>
+                </p>
+                @if (confirming() === row.postingId) {
+                  <p class="links">
+                    <button type="button" class="btn danger small" [disabled]="deleting()" (click)="remove(row.postingId)">
+                      Delete this match
+                    </button>
+                    <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
+                  </p>
+                } @else {
+                  <p class="links">
+                    <button type="button" class="btn ghost small" (click)="confirming.set(row.postingId)">Delete</button>
+                  </p>
+                }
+              </div>
+              <p class="score-num" [attr.data-tone]="toneOf(row)">
+                @if (row.total !== null) {
+                  {{ row.total }}<span>/100</span>
+                } @else {
+                  —
+                }
+                <span class="estimate">Vettyou estimate</span>
+                <span class="line">{{ lineOf(row) }}</span>
+              </p>
+            </article>
+          }
+        </section>
+      </div>
+
       <section class="card" aria-labelledby="plot-heading">
         <h2 id="plot-heading">Date and coverage</h2>
         <div class="plot-wrap">
@@ -76,9 +147,6 @@
         </p>
       </section>
 
-      @if (opening()) {
-        <p role="status">Opening…</p>
-      }
       @if (openedPosting(); as posting) {
         <section class="card detail" [attr.aria-labelledby]="'job-' + posting.id">
           <div class="detail-copy">
@@ -148,65 +216,9 @@
             <h3>Saved posting</h3>
             <pre class="posting">{{ posting.body }}</pre>
           </div>
-          @if (opened(); as resume) {
-            <app-resume-preview
-              [postingId]="resume.postingId"
-              [resumeId]="resume.id"
-              [highlights]="highlights()"
-              [picked]="picked()"
-              (pick)="choose($event)"
-            />
-          }
         </section>
       }
 
-      <section class="card" aria-labelledby="table-heading">
-        <h2 id="table-heading">Saved jobs, newest first</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Saved</th>
-              <th>Coverage</th>
-              <th>Job</th>
-              <th>Line</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of rows(); track row.postingId) {
-              <tr [class.sel]="openedPosting()?.id === row.postingId">
-                <td>{{ row.createdAt | date: 'MMM d' }}</td>
-                <td class="num" [attr.data-tone]="toneOf(row)">
-                  @if (row.total !== null) {
-                    {{ row.total }}
-                  } @else {
-                    —
-                  }
-                </td>
-                <td>
-                  <button type="button" class="link" (click)="open(row)">
-                    {{ row.title }}
-                    @if (row.company) {
-                      <span class="company">{{ row.company }}</span>
-                    }
-                  </button>
-                </td>
-                <td>{{ lineOf(row) }}</td>
-                <td>
-                  @if (confirming() === row.postingId) {
-                    <button type="button" class="btn danger small" [disabled]="deleting()" (click)="remove(row.postingId)">
-                      Delete this match
-                    </button>
-                    <button type="button" class="btn ghost small" (click)="confirming.set('')">Cancel</button>
-                  } @else {
-                    <button type="button" class="btn ghost small" (click)="confirming.set(row.postingId)">Delete</button>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </section>
     }
   }
 </section>
