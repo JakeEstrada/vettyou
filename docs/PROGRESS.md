@@ -29,6 +29,13 @@ Update at the end of every working session. Newest entry on top.
 
 ## Session log
 
+### 2026-11-14: Home stylesheet under the production budget
+
+- **Done:** Removed the old signed-in Home styles (resume sheet, job tabs, keyword box). Signed-in Home is ATS global, so those rules were unused and pushed `home-page.scss` 205 bytes over the 8 kB error budget.
+- **Files changed:** `home-page.scss`.
+- **Tests run / results:** `npm run build` succeeded (exit 0). `home-page.scss` is 6.16 kB, under the 8 kB error budget. The 4 kB warning remains because of the landing animation.
+- **Next step:** Redeploy the frontend.
+
 ### 2026-11-14: ATS global apply line 75, dark dashboard
 
 - **Done:** The dashed apply line is 75. ATS global uses the app’s dark surface: left-aligned header, dark panels, copper line, muted table, coverage colored by the line.
