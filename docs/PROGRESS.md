@@ -35,7 +35,7 @@ Update at the end of every working session. Newest entry on top.
 - **Files changed:** `backend/Dockerfile`, `backend/.dockerignore`, `application.yml`.
 - **Decisions:** Direct Temurin 21 image. Skip tests in the image build; CI still runs them. Free Render instance is acceptable for a first boot.
 - **Tests run / results:** Not executed. Pushed so Render can build it.
-- **Next step:** Redeploy the Render service. Root directory `backend`, Dockerfile path `Dockerfile`.
+- **Next step:** Render health is 200. `frontend/vercel.json` now proxies `/api/:path*` to `https://vettyou.onrender.com/api/:path*`. That file is not on the live site until it is pushed and Vercel redeploys. Registration on www.vettyou.com still returns Vercel's 405 until then.
 
 ### 2026-11-14: Home stylesheet under the production budget
 
